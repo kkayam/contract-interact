@@ -8,6 +8,8 @@ export default function Home() {
   const [contractAddress, setContractAddress] = useState('');
   const [blockchain, setBlockchain] = useState('');
   const [abi, setAbi] = useState(null);
+  const [result, setResult] = useState(null);
+
 
   const blockchainOptions = {
     // Add your supported EVM blockchains here with their chainId values
@@ -56,7 +58,7 @@ export default function Home() {
 
   const fetchAbi = async () => {
     let abi;
-    const apiKey = "66YSGX47G6BV19BWC5U93GCWBX7EZXJ6SK";
+    const apiKey = "";
     const apiUrl = blockchainOptions[blockchain].abiUrl + `${contractAddress}&apikey=${apiKey}`;
     const response = await fetch(apiUrl);
     const data = await response.json();
@@ -92,12 +94,9 @@ export default function Home() {
       await window.ethereum.request({ method: 'eth_requestAccounts' });
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const contract = new ethers.Contract(contractAddress, abi, provider);
-      // balance = await contract.getBalance("0x7C76C63DB86bfB5437f7426F4C37b15098Bb81da");
-      // const contract = new ethers.Contract(contractAddress, abi, walletAddress);
-      console.log(contract);
       try {
         const result = await contract.functions[func.name](...values);
-        console.log('Transaction result:', result);
+        setResult(result); // Store the result in the state
       } catch (error) {
         console.error('Transaction error:', error);
       }
@@ -122,8 +121,8 @@ export default function Home() {
         ) : (
           <button onClick={handleWalletConnect}>Connect your wallet</button>
         )}
-        <div>
-          <label>
+        <div className="row">
+          <label className="contract-address-input">
             Contract Address:
             <input type="text" value={contractAddress} onChange={event => setContractAddress(event.target.value)} />
           </label>
@@ -151,15 +150,20 @@ export default function Home() {
                 .map((func) => (
                   <div key={func.name}>
                     <h4>{func.name}</h4>
-                    <button onClick={() => handleInteract(func)}>Interact</button>
-                    {func.inputs.map((input, index) => (
-                      <div key={index}>
-                        <label>
+                    <div className="row">
+                      {func.inputs.map((input, index) => (
+                        <label key={index} className="interact-input">
                           {input.name} ({input.type}):
                           <input id={func.name + "." + input.name} placeholder={`Enter ${input.name}`} />
                         </label>
+                      ))}
+                      <button className="interact-button" onClick={() => handleInteract(func)}>Interact</button>
+                    </div>
+                    {result && (
+                      <div>
+                        <p>Result: {JSON.stringify(result)}</p>
                       </div>
-                    ))}
+                    )}
                   </div>
                 ))}
             </div>
