@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint"
   },
+  "proxy": "http://localhost:3001",
   "dependencies": {
     "ethers": "^5.7.2",
     "next": "13.2.4",

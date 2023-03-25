@@ -13,6 +13,7 @@ main {
   flex-direction: column;
   align-items: center;
   padding: 1rem;
+  padding-top: 10rem;
   background-color: #f7f8fa;
   min-height: 100vh;
 }
@@ -46,26 +47,21 @@ button:hover {
   background-color: #1956bc;
 }
 
-input,
-select {
+input.main,
+select.main {
   border: 1px solid #d1d5db;
   border-radius: 8px;
   padding: 8px;
-  font-size: 0.9rem;
+  font-size: 1.3rem;
   outline: none;
-  width: 100%;
   margin-top: 8px;
 }
 
-div {
-  margin-bottom: 1rem;
+input.main {
+  width: 60%;
 }
-
-label {
-  font-size: 0.9rem;
-  color: #1c1e21;
-  display: block;
-  margin-bottom: 4px;
+select.main {
+  width: 30%;
 }
 
 h3 {
@@ -74,39 +70,91 @@ h3 {
   margin-bottom: 0.5rem;
 }
 
-h4 {
-  font-size: 1.2rem;
+h4.function-title,
+h4.status {
+  max-width: 15%;
+  min-width: 15%;
+  font-size: 0.8rem;
   color: #1c1e21;
   margin-bottom: 0.5rem;
   margin-top: 1rem;
+}
+
+h4.status {
+  color: red;
+  margin-bottom: 4rem;
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  28.57% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 
 /* Align elements horizontally */
 .row {
   display: flex;
   align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 2rem;
+  margin-bottom: 3rem;
+  column-gap: 10px;
+  width: 80%;
+}
+
+.function-row {
+  display: flex;
+  align-items: flex-start;
   justify-content: space-between;
   flex-wrap: wrap;
+  column-gap: 10px;
+  width: 100%;
 }
 
-/* Adjust the width of the inputs and selects */
-input,
-select {
-  /* ...previous styles... */
-  width: calc(50% - 8px); /* Adjust the width to fit side by side with some spacing */
+.contract {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+  background-color: #f7f8fa;
+  min-height: 100vh;
+  width: 50%;
 }
 
-/* Add some margin to the right of the contract address input field */
-.contract-address-input {
-  margin-right: 8px;
+.function-inputs {
+  min-width: 40%;
+  max-width: 40%;
+
+  display: flex;
+  flex-direction: column;
 }
 
-/* Add some margin to the right of the input fields */
-.interact-input {
-  margin-right: 8px;
+.interact-input > input {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 8px;
+  font-size: 0.9rem;
+  outline: none;
+  margin-top: 8px;
 }
 
-/* Add some margin to the bottom of the interact buttons */
-.interact-button {
-  margin-bottom: 8px;
+.function-interact-button {
+  min-width: 15%;
+  max-width: 15%;
+}
+.center-content {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 20px;
 }

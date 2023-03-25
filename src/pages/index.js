@@ -3,13 +3,62 @@ import { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
 
 
+function formatSolidityData(value) {
+  if (value === null || value === undefined) {
+    return "";
+  }
+
+  if (value.type && value.type == "BigNumber") {
+    return value.toNumber();
+  }
+
+  if (Array.isArray(value)) {
+    return value.map(item => formatSolidityData(item)).toString();
+  }
+
+  if (typeof value === "string") {
+    if (value.startsWith("0x") && value.length === 42) {
+      // Assume it's an address
+      return value.toLowerCase();
+    }
+    return value;
+  }
+
+  if (typeof value === "boolean") {
+    return value.toString();
+  }
+
+  return value.toString();
+}
+
 export default function Home() {
   const [walletAddress, setWalletAddress] = useState(null);
   const [contractAddress, setContractAddress] = useState('');
-  const [blockchain, setBlockchain] = useState('');
+  const [blockchain, setBlockchain] = useState("Ethereum");
   const [abi, setAbi] = useState(null);
-  const [result, setResult] = useState(null);
+  const [result, setResult] = useState({});
+  const [status, _setStatus] = useState("");
 
+
+  var fade1;
+  var fade2;
+
+
+  function fadeOutText(element, duration) {
+    const fadeDuration = duration || 5000;
+    let opacity = 1;
+    const fadeStep = 20; // Adjust this value to change the smoothness of the fade-out effect
+    const interval = fadeDuration / fadeStep;
+
+    fade2 = setInterval(() => {
+      opacity -= 1 / fadeStep;
+      element.style.opacity = opacity;
+
+      if (opacity <= 0) {
+        clearInterval(fade2);
+      }
+    }, interval);
+  }
 
   const blockchainOptions = {
     // Add your supported EVM blockchains here with their chainId values
@@ -44,7 +93,7 @@ export default function Home() {
   };
 
 
-  async function switchEthereumChain(chainId) {
+  async function switchChain(chainId) {
     try {
       await window.ethereum.request({
         method: 'wallet_switchEthereumChain',
@@ -55,17 +104,27 @@ export default function Home() {
     }
   }
 
+  async function setStatus(message) {
+    _setStatus(message);
+    var textElement = document.querySelectorAll(".status")[0];
+    textElement.style.opacity = 1;
+    clearInterval(fade2);
+    clearTimeout(fade1);
+    fade1 = setTimeout(() => {
+      fadeOutText(textElement, 2000);
+    }, 3000);
+  }
 
   const fetchAbi = async () => {
-    let abi;
-    const apiKey = "";
-    const apiUrl = blockchainOptions[blockchain].abiUrl + `${contractAddress}&apikey=${apiKey}`;
-    const response = await fetch(apiUrl);
-    const data = await response.json();
-    if (data.status === '1') {
-      abi = JSON.parse(data.result);
-    }
-    return abi;
+    const apiUrl = "http://localhost:3000/fetch-abi?contractAddress=" + contractAddress + "&blockchain=" + blockchain;
+    let response = await fetch(apiUrl, {
+      method: "GET",
+      headers: {
+        "Accept": "application/json"
+      }
+    });
+    const json = await response.json();
+    return json;
   };
 
   useEffect(() => {
@@ -80,23 +139,29 @@ export default function Home() {
 
   const handleInteract = async (func) => {
     if (!walletAddress) {
-      console.error('Please connect your wallet first');
+      setStatus('Please connect your wallet first');
       return;
     }
 
     if (!abi) {
-      console.error('Please enter a valid contract address and select a blockchain');
+      setStatus('Please enter a valid contract address and select a blockchain');
       return;
     }
 
+    if (window.ethereum.networkVersion != blockchainOptions[blockchain].chainId) {
+      switchChain(blockchainOptions[blockchain].chainId);
+    }
+
     try {
-      const values = func.inputs.map((input) => document.getElementById(func.name + "." + input.name));
+      const values = func.inputs.map((input) => document.getElementById(func.name + "." + input.name).value);
       await window.ethereum.request({ method: 'eth_requestAccounts' });
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const contract = new ethers.Contract(contractAddress, abi, provider);
       try {
-        const result = await contract.functions[func.name](...values);
-        setResult(result); // Store the result in the state
+        const response = await contract.functions[func.name](...values);
+        let result_state = { ...result };
+        result_state[func.name] = response;
+        setResult(result_state); // Store the result in the state
       } catch (error) {
         console.error('Transaction error:', error);
       }
@@ -112,64 +177,56 @@ export default function Home() {
       </Head>
 
       <main>
-        <h1>Welcome to Blockchain Interactor</h1>
-        <p>
-          This website allows you to interact with any EVM-compatible smart contract on any supported blockchain network.
-        </p>
         {walletAddress ? (
           <p>Connected wallet address: {walletAddress}</p>
         ) : (
           <button onClick={handleWalletConnect}>Connect your wallet</button>
         )}
         <div className="row">
-          <label className="contract-address-input">
-            Contract Address:
-            <input type="text" value={contractAddress} onChange={event => setContractAddress(event.target.value)} />
-          </label>
+          <input className='main' type="text" placeholder='Contract Address..' value={contractAddress} onChange={event => setContractAddress(event.target.value)} />
+          <select className='main' id='blockchainList' value={blockchain.name} onChange={event => setBlockchain(event.target.value)}>
+            {Object.values(blockchainOptions).map((blockchain) => (
+              <option key={blockchain.name} value={blockchain.name}>
+                {blockchain.name}
+              </option>
+            ))}
+          </select>
         </div>
-        <div>
-          <label>
-            Blockchain:
-            <select id='blockchainList' value={blockchain.name} onChange={event => setBlockchain(event.target.value)}>
-              <option value="">Select a blockchain</option>
-              {Object.values(blockchainOptions).map((blockchain) => (
-                <option key={blockchain.name} value={blockchain.name}>
-                  {blockchain.name}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
+        <h4 id="status" className='status'>{status}</h4>
         {
           abi && (
-            <div>
-              <h3>Contract Functions</h3>
+            <div className='contract'>
               {/* Render buttons and input fields for each function in the ABI */}
               {abi
                 .filter((item) => item.type === 'function')
                 .map((func) => (
-                  <div key={func.name}>
-                    <h4>{func.name}</h4>
-                    <div className="row">
-                      {func.inputs.map((input, index) => (
-                        <label key={index} className="interact-input">
-                          {input.name} ({input.type}):
-                          <input id={func.name + "." + input.name} placeholder={`Enter ${input.name}`} />
-                        </label>
-                      ))}
-                      <button className="interact-button" onClick={() => handleInteract(func)}>Interact</button>
+                  <div className='center-content' key={func.name + "." + func.inputs.map(input => input.name).join(".")}>
+                    <div className="function-row">
+                      <h4 className='function-title'>{func.name}</h4>
+                      {func.inputs.length > 0 &&
+                        <div className='function-inputs'>
+                          {func.inputs.map((input, index) => (
+                            <label key={index} className="interact-input">
+                              <input id={func.name + "." + input.name} placeholder={`${input.name} (${input.type})`} />
+                            </label>
+                          ))}
+                        </div>}
+                      <div className='function-interact-button center-content'>
+                        <button className="interact-button" onClick={() => handleInteract(func)}>Interact</button>
+                      </div>
                     </div>
-                    {result && (
+                    {result[func.name] && (
                       <div>
-                        <p>Result: {JSON.stringify(result)}</p>
+                        {result[func.name].map((r) => <p>{formatSolidityData(r)}</p>)}
                       </div>
                     )}
                   </div>
-                ))}
-            </div>
+                ))
+              }
+            </div >
           )
         }
       </main >
     </div >
   );
-}
+};
