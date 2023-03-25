@@ -49,26 +49,6 @@ export default function Home() {
   const [abiModal, setAbiModal] = useState(false);
 
 
-  var fade1;
-  var fade2;
-
-
-  function fadeOutText(element, duration) {
-    const fadeDuration = duration || 5000;
-    let opacity = 1;
-    const fadeStep = 20; // Adjust this value to change the smoothness of the fade-out effect
-    const interval = fadeDuration / fadeStep;
-
-    fade2 = setInterval(() => {
-      opacity -= 1 / fadeStep;
-      element.style.opacity = opacity;
-
-      if (opacity <= 0) {
-        clearInterval(fade2);
-      }
-    }, interval);
-  }
-
   const supportedBlockchains = ["Ethereum", "Binance Smart Chain", "Polygon", "Sepolia"];
 
   const handleWalletConnect = async () => {
@@ -124,18 +104,11 @@ export default function Home() {
   async function setStatus(message) {
     window.scroll({ top: 0, left: 0, behavior: 'smooth' });
     _setStatus(message);
-    var textElement = document.querySelectorAll(".status")[0];
-    textElement.style.opacity = 1;
+    var textElement = document.querySelectorAll("#status")[0];
 
-    clearInterval(fade2);
-    fade2 = null;
-
-    clearTimeout(fade1);
-    fade1 = null;
-
-    fade1 = setTimeout(() => {
-      fadeOutText(textElement, 2000);
-    }, 10000);
+    textElement.className = "";
+    textElement.offsetWidth;
+    textElement.className = "status";
   }
 
   const fetchAbi = async () => {
