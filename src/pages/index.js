@@ -248,20 +248,13 @@ export default function Home() {
                       {func.inputs.length > 0 &&
                         <div className='function-inputs'>
                           {func.inputs.map((input, index) => (
-                            <label key={index} className="interact-input">
-                              <input id={func.name + "." + input.name} placeholder={`${input.name} (${input.type})`} />
-                            </label>
+                            <input key={index} className="interact-input" id={func.name + "." + input.name} placeholder={`${input.name} (${input.type})`} />
                           ))}
                         </div>}
-                      <div className='function-interact-button center-content'>
-                        <button className="interact-button" onClick={() => handleInteract(func)}>Interact</button>
-                      </div>
+                      <button className="interact-button" onClick={() => handleInteract(func)}>Interact</button>
                     </div>
-                    {result[getUniqueFuncName(func)] && (
-                      <div>
-                        {result[getUniqueFuncName(func)].map((r) => <p dangerouslySetInnerHTML={{ __html: formatSolidityData(r) }}></p>)}
-                      </div>
-                    )}
+                    {result[getUniqueFuncName(func)] &&
+                      result[getUniqueFuncName(func)].map((r) => <p dangerouslySetInnerHTML={{ __html: formatSolidityData(r) }}></p>)}
                   </div>
                 ))
               }

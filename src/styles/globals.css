@@ -174,7 +174,7 @@ a {
   flex-direction: column;
 }
 
-.interact-input > input {
+.interact-input {
   width: 100%;
   border: 1px solid #d1d5db;
   border-radius: 8px;
@@ -184,7 +184,7 @@ a {
   margin-top: 8px;
 }
 
-.function-interact-button {
+.interact-button {
   min-width: 15%;
   max-width: 15%;
 }
@@ -216,22 +216,6 @@ a {
   border-radius: 5px;
   width: 300px;
   min-height: 370px;
-}
-
-.results-list {
-  list-style-type: none;
-  padding: 0;
-  margin-top: 10px;
-}
-
-.result-item {
-  padding: 5px 0;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.result-item:hover {
-  background-color: #f0f0f0;
 }
 
 .json-input-modal {
