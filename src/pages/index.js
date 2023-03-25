@@ -5,33 +5,6 @@ const chains = require('../../public/chains.json');
 import SearchModal from '../components/SearchModal';
 import JsonInputModal from '../components/JsonInputModal';
 
-function formatSolidityData(value) {
-  if (value === null || value === undefined) {
-    return "";
-  }
-
-  if (value.type && value.type == "BigNumber") {
-    return value.toNumber();
-  }
-
-  if (Array.isArray(value)) {
-    return value.map(item => formatSolidityData(item)).toString();
-  }
-
-  if (typeof value === "string") {
-    if (value.startsWith("0x") && value.length === 42) {
-      // Assume it's an address
-      return value.toLowerCase();
-    }
-    return value;
-  }
-
-  if (typeof value === "boolean") {
-    return value.toString();
-  }
-
-  return value.toString();
-}
 
 function getUniqueFuncName(func) {
   return func.name + "(" + func.inputs.map(input => input.type).join(",") + ")";
@@ -48,6 +21,34 @@ export default function Home() {
   const [searchModal, setSearchModal] = useState(false);
   const [abiModal, setAbiModal] = useState(false);
 
+  function formatSolidityData(value) {
+    if (value === null || value === undefined) {
+      return "";
+    }
+
+    if (value.type && value.type == "BigNumber") {
+      return value.toNumber();
+    }
+
+    if (Array.isArray(value)) {
+      return value.map(item => formatSolidityData(item)).toString();
+    }
+
+    if (typeof value === "string") {
+      if (value.startsWith("0x") && value.length === 42) {
+        // Assume it's an address
+        return value.toLowerCase();
+      }
+      const regex = /\b\w{66}\b/g;
+      return value.replace(regex, (match) => `<a target=”_blank” href="${chains.filter(chain => chain.name.includes(blockchain))[0].explorers[0].url + "/tx/" + match}">${match}</a>`);
+    }
+
+    if (typeof value === "boolean") {
+      return value.toString();
+    }
+
+    return value.toString();
+  }
 
   const supportedBlockchains = ["Ethereum", "Binance Smart Chain", "Polygon", "Sepolia"];
 
@@ -178,16 +179,19 @@ export default function Home() {
           result_state[method] = response;
           setResult(result_state); // Store the result in the state
         } catch (error) {
-          setStatus(JSON.stringify(error));
+          setStatus(JSON.stringify(error.reason || error));
         }
       } else {
         // Write operation: Send a transaction and wait for it to be mined
         const tx = await contract.functions[method](...values);
         const receipt = await tx.wait();
         console.log(receipt);
+        let result_state = { ...result };
+        result_state[method] = ["Transaction successful: " + receipt.transactionHash];
+        setResult(result_state); // Store the result in the state
       }
     } catch (error) {
-      setStatus(JSON.stringify(error));
+      setStatus(JSON.stringify(error.reason || error));
     }
   };
 
@@ -250,7 +254,7 @@ export default function Home() {
                     </div>
                     {result[getUniqueFuncName(func)] && (
                       <div>
-                        {result[getUniqueFuncName(func)].map((r) => <p>{formatSolidityData(r)}</p>)}
+                        {result[getUniqueFuncName(func)].map((r) => <p dangerouslySetInnerHTML={{ __html: formatSolidityData(r) }}></p>)}
                       </div>
                     )}
                   </div>

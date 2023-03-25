@@ -109,6 +109,11 @@ h4.status {
   animation: fadeOut 3s forwards;
 }
 
+a {
+  color: #2172e5;
+  text-decoration: none;
+}
+
 @keyframes fadeOut {
   0%,
   66.67% {
