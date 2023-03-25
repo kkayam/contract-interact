@@ -144,7 +144,6 @@ export default function Home() {
         setAbi(null);
       }
     } else {
-      setStatus('Abi not found');
       setAbi(null);
     }
   }, [contractAddress, blockchain]);
