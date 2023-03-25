@@ -6,7 +6,9 @@ body {
   box-sizing: border-box;
   font-family: 'Inter', sans-serif;
 }
-
+* {
+  box-sizing: border-box;
+}
 /* Main layout */
 main {
   display: flex;
@@ -102,10 +104,9 @@ h3 {
 h4.function-title {
   max-width: 15%;
   min-width: 15%;
-  margin-bottom: 0.5rem;
   color: #1c1e21;
-  margin-top: 1rem;
   font-size: 0.8rem;
+  margin: 0;
 }
 
 h4.status {
@@ -169,7 +170,7 @@ a {
 .function-inputs {
   min-width: 40%;
   max-width: 40%;
-
+  gap: 10px;
   display: flex;
   flex-direction: column;
 }
@@ -178,10 +179,10 @@ a {
   width: 100%;
   border: 1px solid #d1d5db;
   border-radius: 8px;
-  padding: 8px;
+  padding: 12px 8px;
   font-size: 0.9rem;
   outline: none;
-  margin-top: 8px;
+  box-sizing: border-box;
 }
 
 .interact-button {
@@ -195,6 +196,9 @@ a {
   align-items: center;
   width: 100%;
   margin-bottom: 20px;
+  padding: 14px 10px;
+  border-radius: 10px;
+  background: lightblue;
 }
 
 .modal-overlay {
