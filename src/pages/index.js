@@ -137,6 +137,9 @@ export default function Home() {
       try {
         fetchAbi().then((fetchedAbi) => {
           setAbi(fetchedAbi);
+          if (fetchedAbi == null) {
+            setStatus('Abi not found');
+          }
         });
       }
       catch (error) {
@@ -197,15 +200,18 @@ export default function Home() {
   return (
     <div>
       <Head>
-        <title>Blockchain Interactor</title>
+        <title>Contract Interact</title>
       </Head>
 
       <main>
-        {walletAddress ? (
-          <p>Connected wallet address: {walletAddress}</p>
-        ) : (
-          <button onClick={handleWalletConnect}>Connect your wallet</button>
-        )}
+        <p className='header'>Add any valid contract address below and select the target blockchain to start interacting with the contract. If ABI is missing, or the target blockchain is Other, you must provide your own ABI.</p>
+        <div className='walletAddressContainer'>
+          {walletAddress ? (
+            <p>Connected wallet address: {walletAddress}</p>
+          ) : (
+            <button onClick={handleWalletConnect}>Connect your wallet</button>
+          )}
+        </div>
         <SearchModal
           isOpen={searchModal}
           onSelect={modalSelect}
