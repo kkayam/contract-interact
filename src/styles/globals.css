@@ -60,6 +60,9 @@ select.main {
 input.main {
   width: 60%;
 }
+input.modalinput {
+  width: -webkit-fill-available;
+}
 select.main {
   width: 30%;
 }
@@ -180,6 +183,7 @@ h4.status {
   padding: 20px;
   border-radius: 5px;
   width: 300px;
+  min-height: 370px;
 }
 
 .results-list {

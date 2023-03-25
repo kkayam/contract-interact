@@ -106,6 +106,15 @@ export default function Home() {
     }
   }
 
+  function modalSelect(blockchain) {
+    selectBlockchain({ target: { value: blockchain } });
+    var blockchainList = document.getElementById("blockchainList");
+    var newOption = document.createElement("option");
+    newOption.innerHTML = `<option key=${blockchain} value=${blockchain}>${blockchain}</option>`.trim();
+    blockchainList.insertBefore(newOption, blockchainList.lastChild);
+    blockchainList.value = blockchain;
+  }
+
   async function setStatus(message) {
     window.scroll({ top: 0, left: 0, behavior: 'smooth' });
     _setStatus(message);
@@ -215,9 +224,7 @@ export default function Home() {
         )}
         <SearchModal
           isOpen={modal}
-          onSelect={(blockchain) => {
-            selectBlockchain({ target: { value: blockchain } });
-          }}
+          onSelect={modalSelect}
           onClose={() => setModal(false)}
         />
         <div className="row">

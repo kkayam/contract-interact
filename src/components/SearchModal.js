@@ -39,7 +39,8 @@ const SearchModal = ({ isOpen, onSelect, onClose }) => {
             >
                 <input
                     type="text"
-                    className="main"
+                    className="main modalinput"
+                    width="100%"
                     placeholder="Search..."
                     value={searchText}
                     onChange={handleSearch}
