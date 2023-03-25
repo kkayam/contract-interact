@@ -70,18 +70,22 @@ h3 {
   margin-bottom: 0.5rem;
 }
 
-h4.function-title,
-h4.status {
+h4.function-title {
   max-width: 15%;
   min-width: 15%;
-  font-size: 0.8rem;
-  color: #1c1e21;
   margin-bottom: 0.5rem;
+  color: #1c1e21;
   margin-top: 1rem;
+  font-size: 0.8rem;
 }
 
 h4.status {
   color: red;
+  font-size: 0.8rem;
+  text-align: center;
+  max-width: 80%;
+  word-wrap: break-word;
+  margin-top: 1rem;
   margin-bottom: 4rem;
 }
 

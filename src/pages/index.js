@@ -31,6 +31,10 @@ function formatSolidityData(value) {
   return value.toString();
 }
 
+function getUniqueFuncName(func) {
+  return func.name + "(" + func.inputs.map(input => input.type).join(",") + ")";
+}
+
 export default function Home() {
   const [walletAddress, setWalletAddress] = useState(null);
   const [contractAddress, setContractAddress] = useState('');
@@ -63,16 +67,16 @@ export default function Home() {
   const blockchainOptions = {
     // Add your supported EVM blockchains here with their chainId values
     Ethereum: {
-      name: 'Ethereum', chainId: '0x1',
-      abiUrl: 'https://api.etherscan.io/api?module=contract&action=getabi&address=',
+      chainId: '0x1',
     },
-    BSC: {
-      name: 'Binance Smart Chain', chainId: '0x38',
-      abiUrl: 'https://api.bscscan.com/api?module=contract&action=getabi&address=',
+    "Binance Smart Chain": {
+      chainId: '0x38',
     },
     Polygon: {
-      name: 'Polygon (Matic)', chainId: '0x89',
-      abiUrl: 'https://api.polygonscan.com/api?module=contract&action=getabi&address=',
+      chainId: '0x89',
+    },
+    Sepolia: {
+      chainId: '0xaa36a7',
     },
   };
 
@@ -105,14 +109,20 @@ export default function Home() {
   }
 
   async function setStatus(message) {
+    window.scroll({ top: 0, left: 0, behavior: 'smooth' });
     _setStatus(message);
     var textElement = document.querySelectorAll(".status")[0];
     textElement.style.opacity = 1;
+
     clearInterval(fade2);
+    fade2 = null;
+
     clearTimeout(fade1);
+    fade1 = null;
+
     fade1 = setTimeout(() => {
       fadeOutText(textElement, 2000);
-    }, 3000);
+    }, 10000);
   }
 
   const fetchAbi = async () => {
@@ -128,7 +138,7 @@ export default function Home() {
   };
 
   useEffect(() => {
-    if (contractAddress && blockchain) {
+    if (contractAddress && contractAddress.length == 42 && blockchain) {
       fetchAbi().then((fetchedAbi) => {
         setAbi(fetchedAbi);
       });
@@ -149,6 +159,7 @@ export default function Home() {
     }
 
     if (window.ethereum.networkVersion != blockchainOptions[blockchain].chainId) {
+      console.log("Try switching to " + blockchain + " network chainId: " + blockchainOptions[blockchain].chainId);
       switchChain(blockchainOptions[blockchain].chainId);
     }
 
@@ -156,17 +167,27 @@ export default function Home() {
       const values = func.inputs.map((input) => document.getElementById(func.name + "." + input.name).value);
       await window.ethereum.request({ method: 'eth_requestAccounts' });
       const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const contract = new ethers.Contract(contractAddress, abi, provider);
-      try {
-        const response = await contract.functions[func.name](...values);
-        let result_state = { ...result };
-        result_state[func.name] = response;
-        setResult(result_state); // Store the result in the state
-      } catch (error) {
-        console.error('Transaction error:', error);
+      const signer = provider.getSigner();
+      const contract = new ethers.Contract(contractAddress, abi, signer);
+
+      var method = getUniqueFuncName(func);
+      if (func.stateMutability && func.stateMutability == "view") {
+        try {
+          const response = await contract.functions[method](...values);
+          let result_state = { ...result };
+          result_state[method] = response;
+          setResult(result_state); // Store the result in the state
+        } catch (error) {
+          setStatus(JSON.stringify(error));
+        }
+      } else {
+        // Write operation: Send a transaction and wait for it to be mined
+        const tx = await contract.functions[method](...values);
+        const receipt = await tx.wait();
+        console.log(receipt);
       }
     } catch (error) {
-      console.error('Error interacting with contract:', error);
+      setStatus(JSON.stringify(error));
     }
   };
 
@@ -185,9 +206,9 @@ export default function Home() {
         <div className="row">
           <input className='main' type="text" placeholder='Contract Address..' value={contractAddress} onChange={event => setContractAddress(event.target.value)} />
           <select className='main' id='blockchainList' value={blockchain.name} onChange={event => setBlockchain(event.target.value)}>
-            {Object.values(blockchainOptions).map((blockchain) => (
-              <option key={blockchain.name} value={blockchain.name}>
-                {blockchain.name}
+            {Object.keys(blockchainOptions).map((blockchain) => (
+              <option key={blockchain} value={blockchain}>
+                {blockchain}
               </option>
             ))}
           </select>
@@ -200,7 +221,7 @@ export default function Home() {
               {abi
                 .filter((item) => item.type === 'function')
                 .map((func) => (
-                  <div className='center-content' key={func.name + "." + func.inputs.map(input => input.name).join(".")}>
+                  <div className='center-content' key={getUniqueFuncName(func)}>
                     <div className="function-row">
                       <h4 className='function-title'>{func.name}</h4>
                       {func.inputs.length > 0 &&
@@ -215,9 +236,9 @@ export default function Home() {
                         <button className="interact-button" onClick={() => handleInteract(func)}>Interact</button>
                       </div>
                     </div>
-                    {result[func.name] && (
+                    {result[getUniqueFuncName(func)] && (
                       <div>
-                        {result[func.name].map((r) => <p>{formatSolidityData(r)}</p>)}
+                        {result[getUniqueFuncName(func)].map((r) => <p>{formatSolidityData(r)}</p>)}
                       </div>
                     )}
                   </div>
