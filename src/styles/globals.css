@@ -106,7 +106,7 @@ h4.status {
   word-wrap: break-word;
   margin-top: 1rem;
   margin-bottom: 4rem;
-  animation: fadeOut 3s forwards;
+  animation: fadeOut 9s forwards;
 }
 
 a {
