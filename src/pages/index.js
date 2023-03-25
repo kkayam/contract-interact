@@ -116,7 +116,7 @@ export default function Home() {
   }
 
   const fetchAbi = async () => {
-    const apiUrl = "http://localhost:3000/fetch-abi?contractAddress=" + contractAddress + "&blockchain=" + blockchain;
+    const apiUrl = "https://contract-interact-node.vercel.app/fetch-abi?contractAddress=" + contractAddress + "&blockchain=" + blockchain;
     let response = await fetch(apiUrl, {
       method: "GET",
       headers: {
