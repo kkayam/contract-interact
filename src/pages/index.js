@@ -2,6 +2,7 @@ import Head from 'next/head';
 import { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
 const chains = require('../../public/chains.json');
+import SearchModal from '../components/SearchModal';
 
 function formatSolidityData(value) {
   if (value === null || value === undefined) {
@@ -43,6 +44,7 @@ export default function Home() {
   const [abi, setAbi] = useState(null);
   const [result, setResult] = useState({});
   const [status, _setStatus] = useState("");
+  const [modal, setModal] = useState(false);
 
 
   var fade1;
@@ -92,6 +94,15 @@ export default function Home() {
       });
     } catch (switchError) {
       console.error(switchError);
+    }
+  }
+
+  function selectBlockchain(event) {
+    if (event.target.value == "Other") {
+      setModal(true);
+    } else {
+      setBlockchain(event.target.value);
+      setChainId(getChainId(event.target.value));
     }
   }
 
@@ -202,14 +213,22 @@ export default function Home() {
         ) : (
           <button onClick={handleWalletConnect}>Connect your wallet</button>
         )}
+        <SearchModal
+          isOpen={modal}
+          onSelect={(blockchain) => {
+            selectBlockchain({ target: { value: blockchain } });
+          }}
+          onClose={() => setModal(false)}
+        />
         <div className="row">
           <input className='main' type="text" placeholder='Contract Address..' value={contractAddress} onChange={event => setContractAddress(event.target.value)} />
-          <select className='main' id='blockchainList' onChange={event => { setBlockchain(event.target.value); setChainId(getChainId(event.target.value)); }}>
+          <select className='main' id='blockchainList' onChange={selectBlockchain}>
             {supportedBlockchains.map((blockchain) => (
               <option key={blockchain} value={blockchain}>
                 {blockchain}
               </option>
             ))}
+            <option key="Other" value="Other">Other</option>
           </select>
         </div>
         <h4 id="status" className='status'>{status}</h4>
