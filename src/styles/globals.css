@@ -219,16 +219,17 @@ h4.status {
 }
 
 .json-input-modal {
+  width: 50%;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   gap: 15px;
 }
 
 .json-textarea {
   width: 100%;
-  height: 200px;
+  height: 300px;
   resize: none;
   border: 1px solid #d1d5db;
   border-radius: 8px;
