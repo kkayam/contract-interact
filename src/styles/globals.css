@@ -119,6 +119,7 @@ h4.status {
   z-index: 1;
   margin-bottom: 4rem;
   animation: fadeOut 9s forwards;
+  min-height: 20px;
 }
 
 a {
@@ -198,9 +199,15 @@ a {
   margin-bottom: 20px;
   padding: 14px 10px;
   border-radius: 10px;
-  background: lightblue;
 }
 
+.read {
+  background-color: #c2ded1;
+}
+
+.write {
+  background-color: #f4bfbf;
+}
 .modal-overlay {
   position: fixed;
   top: 0;

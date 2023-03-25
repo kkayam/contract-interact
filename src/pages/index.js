@@ -242,7 +242,7 @@ export default function Home() {
               {abi
                 .filter((item) => item.type === 'function')
                 .map((func) => (
-                  <div className='center-content' key={getUniqueFuncName(func)}>
+                  <div className={(func.stateMutability == "view") ? "center-content read" : "center-content write"} key={getUniqueFuncName(func)}>
                     <div className="function-row">
                       <h4 className='function-title'>{func.name}</h4>
                       {func.inputs.length > 0 &&
