@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import Fuse from 'fuse.js';
 
 const chains = require('../../public/chains.json').map(chain => chain.name);
-console.log(chains);
 
 const fuse = new Fuse(chains, { includeScore: true, threshold: 0.3 });
 
