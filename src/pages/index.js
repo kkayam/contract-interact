@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
 const chains = require('../../public/chains.json');
 import SearchModal from '../components/SearchModal';
+import JsonInputModal from '../components/JsonInputModal';
 
 function formatSolidityData(value) {
   if (value === null || value === undefined) {
@@ -44,7 +45,8 @@ export default function Home() {
   const [abi, setAbi] = useState(null);
   const [result, setResult] = useState({});
   const [status, _setStatus] = useState("");
-  const [modal, setModal] = useState(false);
+  const [searchModal, setSearchModal] = useState(false);
+  const [abiModal, setAbiModal] = useState(false);
 
 
   var fade1;
@@ -99,7 +101,7 @@ export default function Home() {
 
   function selectBlockchain(event) {
     if (event.target.value == "Other") {
-      setModal(true);
+      setSearchModal(true);
     } else {
       setBlockchain(event.target.value);
       setChainId(getChainId(event.target.value));
@@ -113,6 +115,10 @@ export default function Home() {
     newOption.innerHTML = `<option key=${blockchain} value=${blockchain}>${blockchain}</option>`.trim();
     blockchainList.insertBefore(newOption, blockchainList.lastChild);
     blockchainList.value = blockchain;
+  }
+
+  function submitCustomAbi(abi) {
+    setAbi(abi);
   }
 
   async function setStatus(message) {
@@ -160,9 +166,11 @@ export default function Home() {
         });
       }
       catch (error) {
+        setStatus('Abi not found');
         setAbi(null);
       }
     } else {
+      setStatus('Abi not found');
       setAbi(null);
     }
   }, [contractAddress, blockchain]);
@@ -173,7 +181,7 @@ export default function Home() {
       return;
     }
 
-    if (!abi) {
+    if (!contractAddress || contractAddress.length != 42 || !abi) {
       setStatus('Please enter a valid contract address and select a blockchain');
       return;
     }
@@ -223,9 +231,14 @@ export default function Home() {
           <button onClick={handleWalletConnect}>Connect your wallet</button>
         )}
         <SearchModal
-          isOpen={modal}
+          isOpen={searchModal}
           onSelect={modalSelect}
-          onClose={() => setModal(false)}
+          onClose={() => setSearchModal(false)}
+        />
+        <JsonInputModal
+          isOpen={abiModal}
+          onSubmit={submitCustomAbi}
+          onClose={() => setAbiModal(false)}
         />
         <div className="row">
           <input className='main' type="text" placeholder='Contract Address..' value={contractAddress} onChange={event => setContractAddress(event.target.value)} />
@@ -237,6 +250,7 @@ export default function Home() {
             ))}
             <option key="Other" value="Other">Other</option>
           </select>
+          <button className='abiButton' onClick={() => setAbiModal(true)}>+ABI</button>
         </div>
         <h4 id="status" className='status'>{status}</h4>
         {

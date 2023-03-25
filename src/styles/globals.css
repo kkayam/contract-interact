@@ -47,6 +47,22 @@ button:hover {
   background-color: #1956bc;
 }
 
+.abiButton {
+  border: 1px solid #d1d5db;
+  background-color: white;
+  color: black;
+  border-radius: 8px;
+  padding: 11px;
+  height: 43.5px;
+  font-size: 1rem;
+  outline: none;
+  margin-top: 8px;
+}
+
+.abiButton:hover {
+  background-color: #d1d5db;
+}
+
 input.main,
 select.main {
   border: 1px solid #d1d5db;
@@ -200,4 +216,23 @@ h4.status {
 
 .result-item:hover {
   background-color: #f0f0f0;
+}
+
+.json-input-modal {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+}
+
+.json-textarea {
+  width: 100%;
+  height: 200px;
+  resize: none;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 8px;
+  font-size: 1rem;
+  outline: none;
 }
