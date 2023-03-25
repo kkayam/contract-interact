@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
-
+const chains = require('../../public/chains.json');
 
 function formatSolidityData(value) {
   if (value === null || value === undefined) {
@@ -39,6 +39,7 @@ export default function Home() {
   const [walletAddress, setWalletAddress] = useState(null);
   const [contractAddress, setContractAddress] = useState('');
   const [blockchain, setBlockchain] = useState("Ethereum");
+  const [chainId, setChainId] = useState("0x1");
   const [abi, setAbi] = useState(null);
   const [result, setResult] = useState({});
   const [status, _setStatus] = useState("");
@@ -64,21 +65,7 @@ export default function Home() {
     }, interval);
   }
 
-  const blockchainOptions = {
-    // Add your supported EVM blockchains here with their chainId values
-    Ethereum: {
-      chainId: '0x1',
-    },
-    "Binance Smart Chain": {
-      chainId: '0x38',
-    },
-    Polygon: {
-      chainId: '0x89',
-    },
-    Sepolia: {
-      chainId: '0xaa36a7',
-    },
-  };
+  const supportedBlockchains = ["Ethereum", "Binance Smart Chain", "Polygon", "Sepolia"];
 
   const handleWalletConnect = async () => {
     try {
@@ -126,22 +113,35 @@ export default function Home() {
   }
 
   const fetchAbi = async () => {
-    const apiUrl = "https://contract-interact-node.vercel.app/fetch-abi?contractAddress=" + contractAddress + "&blockchain=" + blockchain;
-    let response = await fetch(apiUrl, {
-      method: "GET",
-      headers: {
-        "Accept": "application/json"
-      }
-    });
-    const json = await response.json();
-    return json;
+    try {
+      const apiUrl = "https://contract-interact-node.vercel.app/fetch-abi?contractAddress=" + contractAddress + "&blockchain=" + blockchain;
+      let response = await fetch(apiUrl, {
+        method: "GET",
+        headers: {
+          "Accept": "application/json"
+        }
+      });
+      const json = await response.json();
+      return json;
+    } catch (error) {
+      return null;
+    }
   };
+
+  function getChainId(blockchain) {
+    return "0x" + chains.filter(chain => chain.name.includes(blockchain))[0].chainId.toString(16);
+  }
 
   useEffect(() => {
     if (contractAddress && contractAddress.length == 42 && blockchain) {
-      fetchAbi().then((fetchedAbi) => {
-        setAbi(fetchedAbi);
-      });
+      try {
+        fetchAbi().then((fetchedAbi) => {
+          setAbi(fetchedAbi);
+        });
+      }
+      catch (error) {
+        setAbi(null);
+      }
     } else {
       setAbi(null);
     }
@@ -158,9 +158,8 @@ export default function Home() {
       return;
     }
 
-    if (window.ethereum.networkVersion != blockchainOptions[blockchain].chainId) {
-      console.log("Try switching to " + blockchain + " network chainId: " + blockchainOptions[blockchain].chainId);
-      switchChain(blockchainOptions[blockchain].chainId);
+    if (window.ethereum.networkVersion != chainId) {
+      switchChain(chainId);
     }
 
     try {
@@ -205,8 +204,8 @@ export default function Home() {
         )}
         <div className="row">
           <input className='main' type="text" placeholder='Contract Address..' value={contractAddress} onChange={event => setContractAddress(event.target.value)} />
-          <select className='main' id='blockchainList' value={blockchain.name} onChange={event => setBlockchain(event.target.value)}>
-            {Object.keys(blockchainOptions).map((blockchain) => (
+          <select className='main' id='blockchainList' onChange={event => { setBlockchain(event.target.value); setChainId(getChainId(event.target.value)); }}>
+            {supportedBlockchains.map((blockchain) => (
               <option key={blockchain} value={blockchain}>
                 {blockchain}
               </option>
