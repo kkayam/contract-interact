@@ -228,7 +228,7 @@ export default function Home() {
         setResult(result_state); // Store the result in the state
       }
     } catch (error) {
-      setStatus(JSON.stringify(error.reason || error));
+      setStatus(JSON.stringify(error.reason || error.message));
     }
   };
 
