@@ -65,7 +65,7 @@ export default function Home() {
         window.open("https://metamask.app.link/dapp/www.contractinteract.com/");
       }
     } catch (error) {
-      setStatus('Error connecting wallet:', error);
+      setStatus('Error connecting wallet');
     }
   };
 
