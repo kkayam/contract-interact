@@ -18,7 +18,7 @@ export default function Home() {
   const [chainId, setChainId] = useState("0x1");
   const [contract, setContract] = useState({});
   const [implementationContract, setImplementationContract] = useState({});
-  const [viewImplementation, setViewImplementation] = useState(true);
+  const [viewImplementation, setViewImplementation] = useState(false);
   const [result, setResult] = useState({});
   const [status, _setStatus] = useState("");
   const [searchModal, setSearchModal] = useState(false);
@@ -199,7 +199,11 @@ export default function Home() {
           } else {
             setContract({ abi: fetchedAbi.ABI, name: fetchedAbi.ContractName });
             if (fetchedAbi.implementation) {
+              setViewImplementation(true);
               setImplementationContract({ abi: fetchedAbi.implementation.ABI, name: fetchedAbi.implementation.ContractName });
+            } else {
+              setViewImplementation(false);
+              setImplementationContract({});
             }
           }
         });
