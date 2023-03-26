@@ -12,17 +12,24 @@ function getUniqueFuncName(func) {
 }
 
 export default function Home() {
+  // Blockchain info
   const [walletAddress, setWalletAddress] = useState(null);
-  const [contractAddress, setContractAddress] = useState('');
   const [blockchain, setBlockchain] = useState("Ethereum");
   const [chainId, setChainId] = useState("0x1");
+
+  // Statuses
+  const [result, setResult] = useState({});
+  const [status, _setStatus] = useState("");
+
+  // Modals
+  const [searchModal, setSearchModal] = useState(false);
+  const [abiModal, setAbiModal] = useState(false);
+
+  // Contract info
+  const [contractAddress, setContractAddress] = useState('');
   const [contract, setContract] = useState({});
   const [implementationContract, setImplementationContract] = useState({});
   const [viewImplementation, setViewImplementation] = useState(false);
-  const [result, setResult] = useState({});
-  const [status, _setStatus] = useState("");
-  const [searchModal, setSearchModal] = useState(false);
-  const [abiModal, setAbiModal] = useState(false);
 
   const router = useRouter();
   const addressInput = useRef(null);
