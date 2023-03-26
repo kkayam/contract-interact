@@ -152,11 +152,6 @@ export default function Home() {
   }, [contractAddress, blockchain]);
 
   const handleInteract = async (func) => {
-    if (!walletAddress) {
-      setStatus('Please connect your wallet first');
-      return;
-    }
-
     if (!contractAddress || contractAddress.length != 42 || !abi) {
       setStatus('Please enter a valid contract address and select a blockchain');
       return;
@@ -171,11 +166,11 @@ export default function Home() {
       await window.ethereum.request({ method: 'eth_requestAccounts' });
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
-      const contract = new ethers.Contract(contractAddress, abi, signer);
 
       var method = getUniqueFuncName(func);
       if (func.stateMutability && func.stateMutability == "view") {
         try {
+          const contract = new ethers.Contract(contractAddress, abi, provider);
           const response = await contract.functions[method](...values);
           let result_state = { ...result };
           result_state[method] = response;
@@ -184,7 +179,12 @@ export default function Home() {
           setStatus(JSON.stringify(error.reason || error));
         }
       } else {
+        if (!walletAddress) {
+          setStatus('Please connect your wallet first');
+          return;
+        }
         // Write operation: Send a transaction and wait for it to be mined
+        const contract = new ethers.Contract(contractAddress, abi, signer);
         const tx = await contract.functions[method](...values);
         const receipt = await tx.wait();
         console.log(receipt);
