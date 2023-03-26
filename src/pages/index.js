@@ -16,8 +16,9 @@ export default function Home() {
   const [contractAddress, setContractAddress] = useState('');
   const [blockchain, setBlockchain] = useState("Ethereum");
   const [chainId, setChainId] = useState("0x1");
-  const [abi, setAbi] = useState(null);
-  const [contractName, setContractName] = useState("");
+  const [contract, setContract] = useState({});
+  const [implementationContract, setImplementationContract] = useState({});
+  const [viewImplementation, setViewImplementation] = useState(true);
   const [result, setResult] = useState({});
   const [status, _setStatus] = useState("");
   const [searchModal, setSearchModal] = useState(false);
@@ -25,6 +26,43 @@ export default function Home() {
 
   const router = useRouter();
   const addressInput = useRef(null);
+
+  function contractView(targetContract) {
+    if (targetContract.abi) {
+      return (
+        <div className='contract'>
+          <div className='row'>
+            <h2 onClick={() => setViewImplementation(false)} className={viewImplementation ? 'contract-name' : 'contract-name selected-name'}>{contract.name}
+            </h2>{implementationContract.name && (<h2 onClick={() => setViewImplementation(true)} className={!viewImplementation ? 'contract-name' : 'contract-name selected-name'}>{implementationContract.name}</h2>)}
+          </div>
+          {/* Render buttons and input fields for each function in the ABI */}
+          {targetContract.abi
+            .filter((item) => item.type === 'function')
+            .map((func) => (
+              <div className="function-container" key={getUniqueFuncName(func)}>
+                <div className="function-row">
+                  <div className='function-title'>
+                    <p className={(func.stateMutability == "view") ? "function-title read" : "function-title write"}>{func.name}</p>
+                  </div>
+                  {func.inputs.length > 0 &&
+                    <div className='function-inputs'>
+                      {func.inputs.map((input, index) => (
+                        <input key={index} className="interact-input" id={func.name + "." + input.name} placeholder={`${input.name} (${input.type})`} />
+                      ))}
+                    </div>}
+                  <button className="interact-button" onClick={() => handleInteract(func)}>Interact</button>
+                </div>
+                <div className='func-result'>
+                  {result[getUniqueFuncName(func)] &&
+                    result[getUniqueFuncName(func)].map((r) => <p dangerouslySetInnerHTML={{ __html: formatSolidityData(r) }}></p>)}
+                </div>
+              </div>
+            ))
+          }
+        </div >
+      );
+    }
+  }
 
   function formatSolidityData(value) {
     if (value === null || value === undefined) {
@@ -79,7 +117,7 @@ export default function Home() {
         params: [{ chainId }],
       });
     } catch (switchError) {
-      console.error(switchError);
+      setStatus(switchError.message || switchError.reason);
     }
   }
 
@@ -104,7 +142,7 @@ export default function Home() {
   }
 
   function submitCustomAbi(abi) {
-    setAbi(abi);
+    setContract({ abi });
   }
 
   async function setStatus(message) {
@@ -119,7 +157,7 @@ export default function Home() {
 
   const fetchAbi = async () => {
     try {
-      const apiUrl = "https://contract-interact-node.vercel.app/fetch-abi?contractAddress=" + contractAddress + "&blockchain=" + blockchain;
+      const apiUrl = "http://localhost:3000/fetch-abi?contractAddress=" + contractAddress + "&blockchain=" + blockchain;
       let response = await fetch(apiUrl, {
         method: "GET",
         headers: {
@@ -159,17 +197,19 @@ export default function Home() {
           if (!fetchedAbi || fetchedAbi.ABI == null) {
             setStatus('Abi not found');
           } else {
-            setAbi(fetchedAbi.ABI);
-            setContractName(fetchedAbi.ContractName ? fetchedAbi.ContractName : "");
+            setContract({ abi: fetchedAbi.ABI, name: fetchedAbi.ContractName });
+            if (fetchedAbi.implementation) {
+              setImplementationContract({ abi: fetchedAbi.implementation.ABI, name: fetchedAbi.implementation.ContractName });
+            }
           }
         });
       }
       catch (error) {
         setStatus('Abi not found');
-        setAbi(null);
+        setContract({});
       }
     } else {
-      setAbi(null);
+      setContract({});
     }
     if (router.isReady) {
       if (contractAddress) {
@@ -193,7 +233,7 @@ export default function Home() {
   }, [contractAddress, blockchain]);
 
   const handleInteract = async (func) => {
-    if (!contractAddress || contractAddress.length != 42 || !abi) {
+    if (!contractAddress || contractAddress.length != 42 || !contract.abi) {
       setStatus('Please enter a valid contract address and select a blockchain');
       return;
     }
@@ -211,7 +251,7 @@ export default function Home() {
       var method = getUniqueFuncName(func);
       if (func.stateMutability && func.stateMutability == "view") {
         try {
-          const contract = new ethers.Contract(contractAddress, abi, provider);
+          const contract = new ethers.Contract(contractAddress, !viewImplementation ? contract.abi : implementationContract.abi, provider);
           const response = await contract.functions[method](...values);
           let result_state = { ...result };
           result_state[method] = response;
@@ -225,7 +265,7 @@ export default function Home() {
           return;
         }
         // Write operation: Send a transaction and wait for it to be mined
-        const contract = new ethers.Contract(contractAddress, abi, signer);
+        const contract = new ethers.Contract(contractAddress, !viewImplementation ? contract.abi : implementationContract.abi, signer);
         const tx = await contract.functions[method](...values);
         const receipt = await tx.wait();
         console.log(receipt);
@@ -276,37 +316,7 @@ export default function Home() {
           <button className='abiButton' onClick={() => setAbiModal(true)}>+ABI</button>
         </div>
         <h4 id="status" className='status'>{status}</h4>
-        {
-          abi && (
-            <div className='contract'>
-              <h2 className='contract-name'>{contractName}</h2>
-              {/* Render buttons and input fields for each function in the ABI */}
-              {abi
-                .filter((item) => item.type === 'function')
-                .map((func) => (
-                  <div className="function-container" key={getUniqueFuncName(func)}>
-                    <div className="function-row">
-                      <div className='function-title'>
-                        <p className={(func.stateMutability == "view") ? "function-title read" : "function-title write"}>{func.name}</p>
-                      </div>
-                      {func.inputs.length > 0 &&
-                        <div className='function-inputs'>
-                          {func.inputs.map((input, index) => (
-                            <input key={index} className="interact-input" id={func.name + "." + input.name} placeholder={`${input.name} (${input.type})`} />
-                          ))}
-                        </div>}
-                      <button className="interact-button" onClick={() => handleInteract(func)}>Interact</button>
-                    </div>
-                    <div className='func-result'>
-                      {result[getUniqueFuncName(func)] &&
-                        result[getUniqueFuncName(func)].map((r) => <p dangerouslySetInnerHTML={{ __html: formatSolidityData(r) }}></p>)}
-                    </div>
-                  </div>
-                ))
-              }
-            </div >
-          )
-        }
+        {contract.abi && !viewImplementation ? contractView(contract) : contractView(implementationContract)}
       </main >
     </div >
   );

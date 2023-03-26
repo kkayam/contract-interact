@@ -267,8 +267,19 @@ a {
   background-color: #eff1f5;
   padding: 13px 29px;
   font-weight: 100;
+  font-size: 1.3rem;
+  user-select: none;
   border-radius: 25px;
   margin-bottom: 3.4rem;
+}
+
+.contract-name:hover {
+  background-color: #d0d7e1;
+  cursor: pointer;
+}
+
+.selected-name {
+  background-color: #d0d7e1;
 }
 
 .func-result > p {
