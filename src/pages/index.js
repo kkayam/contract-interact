@@ -17,6 +17,7 @@ export default function Home() {
   const [blockchain, setBlockchain] = useState("Ethereum");
   const [chainId, setChainId] = useState("0x1");
   const [abi, setAbi] = useState(null);
+  const [contractName, setContractName] = useState("");
   const [result, setResult] = useState({});
   const [status, _setStatus] = useState("");
   const [searchModal, setSearchModal] = useState(false);
@@ -151,7 +152,8 @@ export default function Home() {
     if (contractAddress && contractAddress.length == 42 && blockchain) {
       try {
         fetchAbi().then((fetchedAbi) => {
-          setAbi(fetchedAbi);
+          setAbi(fetchedAbi.ABI);
+          setContractName(fetchedAbi.ContractName);
           if (fetchedAbi == null) {
             setStatus('Abi not found');
           }
@@ -272,6 +274,7 @@ export default function Home() {
         {
           abi && (
             <div className='contract'>
+              <h2 className='contract-name'>{contractName}</h2>
               {/* Render buttons and input fields for each function in the ABI */}
               {abi
                 .filter((item) => item.type === 'function')

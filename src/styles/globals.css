@@ -104,7 +104,7 @@ p.function-title {
   padding: 3px 10px;
   font-size: 0.8rem;
   margin: 0;
-  font-weight: 600;
+  font-weight: 500;
   word-break: break-all;
   width: fit-content;
 }
@@ -123,7 +123,7 @@ h4.status {
   word-wrap: break-word;
   margin-top: 1rem;
   z-index: 1;
-  margin-bottom: 4rem;
+  margin-bottom: 1rem;
   animation: fadeOut 9s forwards;
   min-height: 20px;
 }
@@ -204,7 +204,11 @@ a {
   margin-bottom: 20px;
   padding: 14px 10px;
   border-radius: 10px;
-  background-color: #f2f2f2;
+  background-color: #eff1f5;
+}
+
+.function-container:hover {
+  background-color: #e0e4eb;
 }
 
 .read {
@@ -259,8 +263,17 @@ a {
   min-height: 3.6rem;
 }
 
+.contract-name {
+  background-color: #eff1f5;
+  padding: 13px 29px;
+  font-weight: 100;
+  border-radius: 25px;
+  margin-bottom: 3.4rem;
+}
+
 .func-result > p {
   word-break: break-all;
+  font-weight: 100;
 }
 
 .results-list {
