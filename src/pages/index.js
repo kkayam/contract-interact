@@ -289,12 +289,13 @@ export default function Home() {
       var method = getUniqueFuncName(func);
       if (func.stateMutability && func.stateMutability == "view") {
         try {
-          const contract = new ethers.Contract(contractAddress, !viewImplementation ? contract.abi : implementationContract.abi, provider);
-          const response = await contract.functions[method](...values);
+          const e_contract = new ethers.Contract(contractAddress, !viewImplementation ? contract.abi : implementationContract.abi, provider);
+          const response = await e_contract.functions[method](...values);
           let result_state = { ...result };
           result_state[method] = response;
           setResult(result_state); // Store the result in the state
         } catch (error) {
+          console.log(error);
           setStatus(JSON.stringify(error.reason || error));
         }
       } else {
@@ -303,8 +304,8 @@ export default function Home() {
           return;
         }
         // Write operation: Send a transaction and wait for it to be mined
-        const contract = new ethers.Contract(contractAddress, !viewImplementation ? contract.abi : implementationContract.abi, signer);
-        const tx = await contract.functions[method](...values);
+        const e_contract = new ethers.Contract(contractAddress, !viewImplementation ? contract.abi : implementationContract.abi, signer);
+        const tx = await e_contract.functions[method](...values);
         const receipt = await tx.wait();
         console.log(receipt);
         let result_state = { ...result };
@@ -312,6 +313,7 @@ export default function Home() {
         setResult(result_state); // Store the result in the state
       }
     } catch (error) {
+      console.log(error);
       setStatus(JSON.stringify(error.reason || error.message));
     }
   };
