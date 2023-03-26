@@ -5,7 +5,7 @@ const chains = require('../../public/chains.json');
 import SearchModal from '../components/SearchModal';
 import JsonInputModal from '../components/JsonInputModal';
 
-const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
 
 function getUniqueFuncName(func) {
   return func.name + "(" + func.inputs.map(input => input.type).join(",") + ")";
@@ -60,8 +60,6 @@ export default function Home() {
         if (window.ethereum) {
           // setWalletAddress((await window.ethereum.request({ method: 'eth_requestAccounts' }))[0]);
         }
-      } else if (window.isMobile) {
-        // window.open("https://metamask.app.link/dapp/www.contractinteract.com/");
       }
       else {
         setStatus('Ethereum provider not found');
