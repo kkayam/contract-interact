@@ -219,7 +219,7 @@ export default function Home() {
         setStatus('Abi not found');
         setContract({});
       }
-    } else if (contractAddress && contractAddress.endsWith(".eth") && blockchain) {
+    } else if (contractAddress && contract.address.length > 4 && contractAddress.endsWith(".eth") && blockchain) {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       provider.resolveName(contractAddress).then((address) => {
         if (address) {
