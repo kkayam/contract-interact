@@ -156,13 +156,6 @@ export default function Home() {
             setStatus('Abi not found');
           }
         });
-        router.push(
-          {
-            pathname: '/',
-            query: { blockchain, contractAddress }
-          }, undefined,
-          { shallow: true }
-        );
       }
       catch (error) {
         setStatus('Abi not found');
@@ -171,7 +164,23 @@ export default function Home() {
     } else {
       setAbi(null);
     }
-
+    if (contractAddress) {
+      router.push(
+        {
+          pathname: '/',
+          query: { blockchain, contractAddress }
+        }, undefined,
+        { shallow: true }
+      );
+    } else {
+      router.push(
+        {
+          pathname: '/',
+          query: { blockchain }
+        }, undefined,
+        { shallow: true }
+      );
+    }
   }, [contractAddress, blockchain]);
 
   const handleInteract = async (func) => {
@@ -278,8 +287,10 @@ export default function Home() {
                         </div>}
                       <button className="interact-button" onClick={() => handleInteract(func)}>Interact</button>
                     </div>
-                    {result[getUniqueFuncName(func)] &&
-                      result[getUniqueFuncName(func)].map((r) => <p dangerouslySetInnerHTML={{ __html: formatSolidityData(r) }}></p>)}
+                    <div className='func-result'>
+                      {result[getUniqueFuncName(func)] &&
+                        result[getUniqueFuncName(func)].map((r) => <p dangerouslySetInnerHTML={{ __html: formatSolidityData(r) }}></p>)}
+                    </div>
                   </div>
                 ))
               }
