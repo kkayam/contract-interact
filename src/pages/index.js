@@ -4,6 +4,8 @@ import { ethers } from 'ethers';
 const chains = require('../../public/chains.json');
 import SearchModal from '../components/SearchModal';
 import JsonInputModal from '../components/JsonInputModal';
+import { useRouter } from 'next/router';
+
 
 function getUniqueFuncName(func) {
   return func.name + "(" + func.inputs.map(input => input.type).join(",") + ")";
@@ -19,6 +21,7 @@ export default function Home() {
   const [status, _setStatus] = useState("");
   const [searchModal, setSearchModal] = useState(false);
   const [abiModal, setAbiModal] = useState(false);
+  const router = useRouter();
 
   function formatSolidityData(value) {
     if (value === null || value === undefined) {
@@ -90,9 +93,11 @@ export default function Home() {
   function modalSelect(blockchain) {
     selectBlockchain({ target: { value: blockchain } });
     var blockchainList = document.getElementById("blockchainList");
-    var newOption = document.createElement("option");
-    newOption.innerHTML = `<option key=${blockchain} value=${blockchain}>${blockchain}</option>`.trim();
-    blockchainList.insertBefore(newOption, blockchainList.lastChild);
+    if (!supportedBlockchains.includes(blockchain)) {
+      var newOption = document.createElement("option");
+      newOption.innerHTML = `<option key=${blockchain} value=${blockchain}>${blockchain}</option>`.trim();
+      blockchainList.insertBefore(newOption, blockchainList.lastChild);
+    }
     blockchainList.value = blockchain;
   }
 
@@ -131,6 +136,18 @@ export default function Home() {
   }
 
   useEffect(() => {
+
+    if (router.isReady) {
+      if (router.query.blockchain) {
+        modalSelect(router.query.blockchain);
+      }
+      if (router.query.contractAddress) {
+        setContractAddress(router.query.contractAddress);
+      }
+    }
+  }, [router.isReady]);
+
+  useEffect(() => {
     if (contractAddress && contractAddress.length == 42 && blockchain) {
       try {
         fetchAbi().then((fetchedAbi) => {
@@ -139,6 +156,13 @@ export default function Home() {
             setStatus('Abi not found');
           }
         });
+        router.push(
+          {
+            pathname: '/',
+            query: { blockchain, contractAddress }
+          }, undefined,
+          { shallow: true }
+        );
       }
       catch (error) {
         setStatus('Abi not found');
@@ -147,6 +171,7 @@ export default function Home() {
     } else {
       setAbi(null);
     }
+
   }, [contractAddress, blockchain]);
 
   const handleInteract = async (func) => {
