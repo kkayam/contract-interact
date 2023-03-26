@@ -347,7 +347,12 @@ a {
   /* Make rows become columns */
   .row {
     flex-direction: column;
+    align-content: center;
     gap: 15px;
+  }
+
+  .contract-name {
+    margin-bottom: 0.4rem;
   }
 
   /* Make modals gain full width */
