@@ -247,6 +247,7 @@ export default function Home() {
       });
     } else {
       setContract({});
+      setImplementationContract({});
     }
     if (router.isReady) {
       if (contractAddress) {
