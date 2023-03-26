@@ -55,12 +55,13 @@ export default function Home() {
 
   const handleWalletConnect = async () => {
     try {
+      window.open("https://metamask.app.link/dapp/www.contractinteract.com/");
       if (typeof window.ethereum !== 'undefined') {
         if (window.ethereum) {
-          setWalletAddress((await window.ethereum.request({ method: 'eth_requestAccounts' }))[0]);
+          // setWalletAddress((await window.ethereum.request({ method: 'eth_requestAccounts' }))[0]);
         }
       } else if (window.isMobile) {
-        window.open("https://metamask.app.link/dapp/www.contractinteract.com/");
+        // window.open("https://metamask.app.link/dapp/www.contractinteract.com/");
       }
       else {
         setStatus('Ethereum provider not found');
