@@ -6,6 +6,10 @@ body {
   box-sizing: border-box;
   font-family: 'Inter', sans-serif;
 }
+
+footer {
+  font-weight: 100;
+}
 /* Main layout */
 main {
   display: flex;
@@ -144,7 +148,8 @@ a {
 }
 
 /* Align elements horizontally */
-.row {
+.row,
+.contract-name-container {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -153,6 +158,10 @@ a {
   margin-bottom: 3rem;
   column-gap: 10px;
   width: 80%;
+}
+
+.contract-name-container {
+  margin-top: 0;
 }
 
 .function-row {
@@ -345,7 +354,8 @@ a {
   }
 
   /* Make rows become columns */
-  .row {
+  .row,
+  .contract-name-container {
     flex-direction: column;
     align-content: center;
     gap: 15px;

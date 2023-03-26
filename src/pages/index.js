@@ -38,7 +38,7 @@ export default function Home() {
     if (targetContract.abi) {
       return (
         <div className='contract'>
-          <div className='row'>
+          <div className='contract-name-container'>
             <h2 onClick={() => setViewImplementation(false)} className={viewImplementation ? 'contract-name' : 'contract-name selected-name'}>{contract.name}
             </h2>{implementationContract.name && (<h2 onClick={() => setViewImplementation(true)} className={!viewImplementation ? 'contract-name' : 'contract-name selected-name'}>{implementationContract.name}</h2>)}
           </div>
@@ -357,6 +357,7 @@ export default function Home() {
         </div>
         <h4 id="status" className='status'>{status}</h4>
         {contract.abi && !viewImplementation ? contractView(contract) : contractView(implementationContract)}
+        <footer>Made by @kkayam, no data is saved, <a href='https://github.com/kkayam/contract-interact'>Github</a></footer>
       </main >
     </div >
   );
