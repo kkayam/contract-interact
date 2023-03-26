@@ -221,7 +221,7 @@ export default function Home() {
           onClose={() => setAbiModal(false)}
         />
         <div className="row">
-          <input className='main' type="text" placeholder='Contract Address..' value={contractAddress} onChange={event => setContractAddress(event.target.value)} />
+          <input className='main' type="text" placeholder='0x00000..' value={contractAddress} onChange={event => setContractAddress(event.target.value)} />
           <select className='main' id='blockchainList' onChange={selectBlockchain}>
             {supportedBlockchains.map((blockchain) => (
               <option key={blockchain} value={blockchain}>
