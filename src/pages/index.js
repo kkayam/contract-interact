@@ -5,8 +5,6 @@ const chains = require('../../public/chains.json');
 import SearchModal from '../components/SearchModal';
 import JsonInputModal from '../components/JsonInputModal';
 
-
-
 function getUniqueFuncName(func) {
   return func.name + "(" + func.inputs.map(input => input.type).join(",") + ")";
 }
@@ -55,15 +53,13 @@ export default function Home() {
 
   const handleWalletConnect = async () => {
     try {
-      window.open("https://metamask.app.link/dapp/www.contractinteract.com/");
       if (typeof window.ethereum !== 'undefined') {
         if (window.ethereum) {
-          // setWalletAddress((await window.ethereum.request({ method: 'eth_requestAccounts' }))[0]);
+          setWalletAddress((await window.ethereum.request({ method: 'eth_requestAccounts' }))[0]);
         }
       }
       else {
-        setStatus('Ethereum provider not found');
-        throw new Error('Ethereum provider not found');
+        window.open("https://metamask.app.link/dapp/www.contractinteract.com/");
       }
     } catch (error) {
       setStatus('Error connecting wallet:', error);
