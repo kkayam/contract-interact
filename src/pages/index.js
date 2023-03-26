@@ -38,12 +38,11 @@ export default function Home() {
     }
 
     if (typeof value === "string") {
-      if (value.startsWith("0x") && value.length === 42) {
-        // Assume it's an address
-        return value.toLowerCase();
-      }
-      const regex = /\b\w{66}\b/g;
-      return value.replace(regex, (match) => `<a target=”_blank” href="${chains.filter(chain => chain.name.includes(blockchain))[0].explorers[0].url + "/tx/" + match}">${match}</a>`);
+      // Assume it's an address
+      const regex_address = /\b\w{42}\b/g;
+      value = value.replace(regex_address, (match) => `<a target=”_blank” href="${chains.filter(chain => chain.name.includes(blockchain))[0].explorers[0].url + "/address/" + match}">${match}</a>`);
+      const regex_transaction = /\b\w{66}\b/g;
+      return value.replace(regex_transaction, (match) => `<a target=”_blank” href="${chains.filter(chain => chain.name.includes(blockchain))[0].explorers[0].url + "/tx/" + match}">${match}</a>`);
     }
 
     if (typeof value === "boolean") {
