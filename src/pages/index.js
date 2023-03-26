@@ -162,9 +162,9 @@ export default function Home() {
     textElement.className = "status";
   }
 
-  const fetchAbi = async () => {
+  const fetchAbi = async (address) => {
     try {
-      const apiUrl = "https://contract-interact-node.vercel.app/fetch-abi?contractAddress=" + contractAddress + "&blockchain=" + blockchain;
+      const apiUrl = "https://contract-interact-node.vercel.app/fetch-abi?contractAddress=" + address + "&blockchain=" + blockchain;
       let response = await fetch(apiUrl, {
         method: "GET",
         headers: {
@@ -200,7 +200,7 @@ export default function Home() {
   useEffect(() => {
     if (contractAddress && contractAddress.length == 42 && blockchain) {
       try {
-        fetchAbi().then((fetchedAbi) => {
+        fetchAbi(contractAddress).then((fetchedAbi) => {
           if (!fetchedAbi || fetchedAbi.ABI == null) {
             setStatus('Abi not found');
           } else {
@@ -219,6 +219,32 @@ export default function Home() {
         setStatus('Abi not found');
         setContract({});
       }
+    } else if (contractAddress.endsWith(".eth") && blockchain) {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      provider.resolveName(contractAddress).then((address) => {
+        if (address) {
+          try {
+            fetchAbi(address).then((fetchedAbi) => {
+              if (!fetchedAbi || fetchedAbi.ABI == null) {
+                setStatus('Abi not found');
+              } else {
+                setContract({ abi: fetchedAbi.ABI, name: fetchedAbi.ContractName });
+                if (fetchedAbi.implementation) {
+                  setViewImplementation(true);
+                  setImplementationContract({ abi: fetchedAbi.implementation.ABI, name: fetchedAbi.implementation.ContractName });
+                } else {
+                  setViewImplementation(false);
+                  setImplementationContract({});
+                }
+              }
+            });
+          }
+          catch (error) {
+            setStatus('Abi not found');
+            setContract({});
+          }
+        }
+      });
     } else {
       setContract({});
     }
