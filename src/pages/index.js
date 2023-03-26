@@ -109,7 +109,7 @@ export default function Home() {
         }
       }
       else {
-        window.open("https://metamask.app.link/dapp/www.contractinteract.com/");
+        window.open("https://metamask.app.link/dapp/" + window.location.href);
       }
     } catch (error) {
       setStatus('Error connecting wallet');
