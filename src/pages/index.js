@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ethers } from 'ethers';
 const chains = require('../../public/chains.json');
 import SearchModal from '../components/SearchModal';
@@ -22,7 +22,9 @@ export default function Home() {
   const [status, _setStatus] = useState("");
   const [searchModal, setSearchModal] = useState(false);
   const [abiModal, setAbiModal] = useState(false);
+
   const router = useRouter();
+  const addressInput = useRef(null);
 
   function formatSolidityData(value) {
     if (value === null || value === undefined) {
@@ -136,7 +138,6 @@ export default function Home() {
   }
 
   useEffect(() => {
-
     if (router.isReady) {
       if (router.query.blockchain) {
         modalSelect(router.query.blockchain);
@@ -148,13 +149,18 @@ export default function Home() {
   }, [router.isReady]);
 
   useEffect(() => {
+    addressInput.current.focus();
+  }, []);
+
+  useEffect(() => {
     if (contractAddress && contractAddress.length == 42 && blockchain) {
       try {
         fetchAbi().then((fetchedAbi) => {
-          setAbi(fetchedAbi.ABI);
-          setContractName(fetchedAbi.ContractName);
-          if (fetchedAbi == null) {
+          if (!fetchedAbi || fetchedAbi.ABI == null) {
             setStatus('Abi not found');
+          } else {
+            setAbi(fetchedAbi.ABI);
+            setContractName(fetchedAbi.ContractName ? fetchedAbi.ContractName : "");
           }
         });
       }
@@ -258,7 +264,7 @@ export default function Home() {
           onClose={() => setAbiModal(false)}
         />
         <div className="row">
-          <input className='main' type="text" placeholder='0x00000..' value={contractAddress} onChange={event => setContractAddress(event.target.value)} />
+          <input ref={addressInput} className='main' type="text" placeholder='0x00000..' value={contractAddress} onChange={event => setContractAddress(event.target.value)} />
           <select className='main' id='blockchainList' onChange={selectBlockchain}>
             {supportedBlockchains.map((blockchain) => (
               <option key={blockchain} value={blockchain}>
