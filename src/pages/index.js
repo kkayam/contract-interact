@@ -164,22 +164,24 @@ export default function Home() {
     } else {
       setAbi(null);
     }
-    if (contractAddress) {
-      router.push(
-        {
-          pathname: '/',
-          query: { blockchain, contractAddress }
-        }, undefined,
-        { shallow: true }
-      );
-    } else {
-      router.push(
-        {
-          pathname: '/',
-          query: { blockchain }
-        }, undefined,
-        { shallow: true }
-      );
+    if (router.isReady) {
+      if (contractAddress) {
+        router.push(
+          {
+            pathname: '/',
+            query: { blockchain, contractAddress }
+          }, undefined,
+          { shallow: true }
+        );
+      } else {
+        router.push(
+          {
+            pathname: '/',
+            query: { blockchain }
+          }, undefined,
+          { shallow: true }
+        );
+      }
     }
   }, [contractAddress, blockchain]);
 
