@@ -61,7 +61,7 @@ export default function Home() {
                 </div>
                 <div className='func-result'>
                   {result[getUniqueFuncName(func)] &&
-                    result[getUniqueFuncName(func)].map((r) => <p dangerouslySetInnerHTML={{ __html: formatSolidityData(r) }}></p>)}
+                    result[getUniqueFuncName(func)].map((r, i) => <p dangerouslySetInnerHTML={{ __html: (func.outputs[i].name ? func.outputs[i].name + " " : "") + formatSolidityData(r) }}></p>)}
                 </div>
               </div>
             ))
