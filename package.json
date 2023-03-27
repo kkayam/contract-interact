@@ -10,6 +10,7 @@
   },
   "proxy": "http://localhost:3001",
   "dependencies": {
+    "@vercel/analytics": "^0.1.11",
     "ethers": "^5.7.2",
     "fuse.js": "^6.6.2",
     "next": "13.2.4",
