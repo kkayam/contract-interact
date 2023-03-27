@@ -357,7 +357,7 @@ export default function Home() {
         </div>
         <h4 id="status" className='status'>{status}</h4>
         {contract.abi && !viewImplementation ? contractView(contract) : contractView(implementationContract)}
-        <footer>Made by @kkayam, no data is saved, <a href='https://github.com/kkayam/contract-interact'>Github</a>, <a href='https://github.com/kkayam/contract-interact/issues'>Request feature</a></footer>
+        <footer>Made by @kkayam, no data is saved, <a href='https://github.com/kkayam/contract-interact'>Github</a>, <a href='https://github.com/kkayam/contract-interact/issues'>Request feature</a>. Powered by Etherscan, BSCScan, Polygonscan.</footer>
       </main >
     </div >
   );
