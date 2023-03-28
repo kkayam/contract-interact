@@ -131,6 +131,9 @@ h4.status {
   animation: fadeOut 9s forwards;
   min-height: 20px;
 }
+p.status {
+  color: red;
+}
 
 a {
   color: #2172e5;

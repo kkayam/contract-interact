@@ -61,7 +61,11 @@ export default function Home() {
                 </div>
                 <div className='func-result'>
                   {result[getUniqueFuncName(func)] &&
-                    result[getUniqueFuncName(func)].map((r, i) => <p dangerouslySetInnerHTML={{ __html: (func.outputs[i].name ? func.outputs[i].name + " " : "") + formatSolidityData(r) }}></p>)}
+                    (result[getUniqueFuncName(func)].type == "result") ?
+                    result[getUniqueFuncName(func)].response.map((r, i) => <p dangerouslySetInnerHTML={{ __html: ((func.outputs[i] && func.outputs[i].name) ? func.outputs[i].name + " " : "") + formatSolidityData(r) }}></p>) : ""}
+
+                  {result[getUniqueFuncName(func)] && (result[getUniqueFuncName(func)].type == "error") ?
+                    result[getUniqueFuncName(func)].response.map((r, i) => <p className='status'>{r}</p>) : ""}
                 </div>
               </div>
             ))
@@ -292,15 +296,19 @@ export default function Home() {
           const e_contract = new ethers.Contract(contractAddress, !viewImplementation ? contract.abi : implementationContract.abi, provider);
           const response = await e_contract.functions[method](...values);
           let result_state = { ...result };
-          result_state[method] = response;
+          result_state[method] = { response, type: "result" };
           setResult(result_state); // Store the result in the state
         } catch (error) {
           console.log(error);
-          setStatus(JSON.stringify(error.reason || error));
+          let result_state = { ...result };
+          result_state[method] = { response: [JSON.stringify(error.reason || error)], type: "error" };
+          setResult(result_state);
         }
       } else {
         if (!walletAddress) {
-          setStatus('Please connect your wallet first');
+          let result_state = { ...result };
+          result_state[method] = { response: ['Please connect your wallet first'], type: "error" };
+          setResult(result_state);
           return;
         }
         // Write operation: Send a transaction and wait for it to be mined
@@ -309,12 +317,14 @@ export default function Home() {
         const receipt = await tx.wait();
         console.log(receipt);
         let result_state = { ...result };
-        result_state[method] = ["Transaction successful: " + receipt.transactionHash];
+        result_state[method] = { response: ["Transaction successful: " + receipt.transactionHash], type: "result" };
         setResult(result_state); // Store the result in the state
       }
     } catch (error) {
       console.log(error);
-      setStatus(JSON.stringify(error.reason || error.message));
+      let result_state = { ...result };
+      result_state[method] = { response: [JSON.stringify(error.reason || error.message)], type: "error" };
+      setStatus(result_state);
     }
   };
 
