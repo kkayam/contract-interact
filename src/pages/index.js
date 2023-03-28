@@ -296,6 +296,10 @@ export default function Home() {
           }
         }
       });
+    } else if (contractAddress && contractAddress.length > 4 && contractAddress.endsWith(".eth") && blockchain && window.ethereum.chainId != 1) {
+      setStatus('ENS only supported on Ethereum Mainnet (switch network on Metamask)');
+      setContract({});
+      setImplementationContract({});
     } else {
       setContract({});
       setImplementationContract({});
@@ -382,7 +386,7 @@ export default function Home() {
       </Head>
 
       <main>
-        <p className='header'>Add any valid contract address below and select the target blockchain to start interacting with the contract. If ABI has not yet been published by the author, or the target blockchain is Other, you must provide your own ABI.</p>
+        <p className='header'>Add any valid contract address (or ENS domain) below and select the target blockchain to start interacting with the contract. If ABI has not yet been published by the author, or the target blockchain is Other, you must provide your own ABI.</p>
         <div className='walletAddressContainer'>
           {walletAddress ? (
             <p>Connected wallet address: {walletAddress}</p>
