@@ -20,6 +20,7 @@ export default function Home() {
   // Statuses
   const [result, setResult] = useState({});
   const [status, _setStatus] = useState("");
+  const [abiCopied, setAbiCopied] = useState(false);
 
   // Modals
   const [searchModal, setSearchModal] = useState(false);
@@ -34,6 +35,15 @@ export default function Home() {
   const router = useRouter();
   const addressInput = useRef(null);
 
+  function copyAbi() {
+    navigator.clipboard.writeText(JSON.stringify(viewImplementation ? implementationContract : contract.abi));
+    setAbiCopied(true);
+  }
+
+  useEffect(() => {
+    setAbiCopied(false);
+  }, [viewImplementation]);
+
   function contractView(targetContract) {
     if (targetContract.abi) {
       return (
@@ -41,10 +51,13 @@ export default function Home() {
           <div className='contract-name-container'>
             <h2 onClick={() => setViewImplementation(false)} className={viewImplementation ? 'contract-name' : 'contract-name selected-name'}>{contract.name}
             </h2>{implementationContract.name && (<h2 onClick={() => setViewImplementation(true)} className={!viewImplementation ? 'contract-name' : 'contract-name selected-name'}>{implementationContract.name}</h2>)}
+            <a className='contract-action' href={chains.filter(chain => chain.name.includes(blockchain))[0].explorers[0].url + "/address/" + contractAddress}>See on explorer</a>
+            <a className='contract-action'><img height="18px" src={abiCopied ? "check.svg" : "copy.svg"} onClick={copyAbi} />&nbsp;ABI</a>
           </div>
           {/* Render buttons and input fields for each function in the ABI */}
           <div className='function-type-row'>
             <div className='function-type-container'>
+              <p className='function-type-container-name'>Read</p>
               {targetContract.abi
                 .filter((item) => item.type === 'function' && item.stateMutability == "view")
                 .map((func) => (
@@ -73,6 +86,7 @@ export default function Home() {
                 ))
               }</div>
             <div className='function-type-container'>
+              <p className='function-type-container-name'>Write</p>
               {targetContract.abi
                 .filter((item) => item.type === 'function' && item.stateMutability != "view")
                 .map((func) => (
@@ -233,6 +247,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    setAbiCopied(false);
     if (contractAddress && contractAddress.length == 42 && blockchain) {
       try {
         fetchAbi(contractAddress).then((fetchedAbi) => {
