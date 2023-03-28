@@ -29,7 +29,7 @@ p.header {
   cursor: pointer;
   display: flex;
   align-items: center;
-  background-color: #e6c300;
+  background-color: #ffd900;
   padding: 5px 15px;
   user-select: none;
   border-radius: 20px;
@@ -37,7 +37,7 @@ p.header {
 }
 
 .contract-action:hover {
-  background-color: #ccad00;
+  background-color: #e6c300;
 }
 
 .walletAddressContainer {
