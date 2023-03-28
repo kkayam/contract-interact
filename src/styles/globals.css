@@ -175,6 +175,18 @@ a {
   column-gap: 10px;
   width: 100%;
 }
+.function-type-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-evenly;
+  flex-wrap: wrap;
+  column-gap: 10px;
+  width: 100%;
+}
+
+.function-type-container {
+  width: 40%;
+}
 
 .contract {
   display: flex;
@@ -182,7 +194,7 @@ a {
   align-items: center;
   padding: 1rem;
   min-height: 100vh;
-  width: 50%;
+  width: 100%;
 }
 
 .function-inputs {
@@ -356,9 +368,14 @@ a {
     width: 90%;
   }
 
+  .function-type-container {
+    width: 90%;
+  }
+
   /* Make rows become columns */
   .row,
-  .contract-name-container {
+  .contract-name-container,
+  .function-type-row {
     flex-direction: column;
     align-content: center;
     gap: 15px;
