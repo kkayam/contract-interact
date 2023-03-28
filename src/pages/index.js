@@ -52,7 +52,7 @@ export default function Home() {
             <h2 onClick={() => setViewImplementation(false)} className={viewImplementation ? 'contract-name' : 'contract-name selected-name'}>{contract.name}
             </h2>{implementationContract.name && (<h2 onClick={() => setViewImplementation(true)} className={!viewImplementation ? 'contract-name' : 'contract-name selected-name'}>{implementationContract.name}</h2>)}
             &nbsp;&nbsp;
-            <a className='contract-action' target="_blank" href={chains.filter(chain => chain.name.includes(blockchain))[0].explorers[0].url + "/address/" + contractAddress}>See in explorer</a>
+            <a className='contract-action' target="_blank" href={chains.filter(chain => chain.name.includes(blockchain))[0].explorers[0].url + "/address/" + contractAddress}>See on explorer</a>
             <a className='contract-action'><img height="18px" src={abiCopied ? "check.svg" : "copy.svg"} onClick={copyAbi} />&nbsp;ABI</a>
           </div>
           {/* Render buttons and input fields for each function in the ABI */}
