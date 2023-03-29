@@ -149,7 +149,7 @@ export default function Home() {
     return value.toString();
   }
 
-  const supportedBlockchains = ["Ethereum", "Binance Smart Chain", "Binance Smart Chain Testnet", "Polygon", "Sepolia"];
+  const supportedBlockchains = ["Ethereum", "Binance Smart Chain", "Binance Smart Chain Testnet", "Polygon", "Sepolia", "Goerli"];
 
   const handleWalletConnect = async () => {
     try {
