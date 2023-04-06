@@ -21,6 +21,7 @@ export default function Home() {
   const [result, setResult] = useState({});
   const [status, _setStatus] = useState("");
   const [abiCopied, setAbiCopied] = useState(false);
+  const [walletCopied, setWalletCopied] = useState(false);
 
   // Modals
   const [searchModal, setSearchModal] = useState(false);
@@ -38,6 +39,12 @@ export default function Home() {
   function copyAbi() {
     navigator.clipboard.writeText(JSON.stringify(viewImplementation ? implementationContract : contract.abi));
     setAbiCopied(true);
+    setWalletCopied(false);
+  }
+  function copyWallet() {
+    navigator.clipboard.writeText(walletAddress);
+    setWalletCopied(true);
+    setAbiCopied(false);
   }
 
   useEffect(() => {
@@ -53,7 +60,7 @@ export default function Home() {
             </h2>{implementationContract.name && (<h2 onClick={() => setViewImplementation(true)} className={!viewImplementation ? 'contract-name' : 'contract-name selected-name'}>{implementationContract.name}</h2>)}
             &nbsp;&nbsp;
             <a className='contract-action' target="_blank" href={chains.filter(chain => chain.name.includes(blockchain))[0].explorers[0].url + "/address/" + contractAddress}>See on explorer</a>
-            <a className='contract-action'><img height="18px" src={abiCopied ? "check.svg" : "copy.svg"} onClick={copyAbi} />&nbsp;ABI</a>
+            <a onClick={copyAbi} className='contract-action'><img height="18px" src={abiCopied ? "check.svg" : "copy.svg"} />&nbsp;ABI</a>
           </div>
           {/* Render buttons and input fields for each function in the ABI */}
           <div className='function-type-row'>
@@ -389,7 +396,7 @@ export default function Home() {
         <p className='header'>Add any valid contract address (or ENS domain) below and select the target blockchain to start interacting with the contract. If ABI has not yet been published by the author, or the target blockchain is Other, you must provide your own ABI.</p>
         <div className='walletAddressContainer'>
           {walletAddress ? (
-            <p>Connected wallet address: {walletAddress}</p>
+            <p onClick={copyWallet}><img height="18px" src={walletCopied ? "check.svg" : "copy.svg"} />&nbsp;{walletAddress}</p>
           ) : (
             <button onClick={handleWalletConnect}>Connect your wallet</button>
           )}

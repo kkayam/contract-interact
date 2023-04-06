@@ -46,6 +46,22 @@ p.header {
   margin-bottom: 1rem;
 }
 
+.walletAddressContainer > p {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  background-color: #e5e6e7;
+  padding: 5px 15px;
+  user-select: none;
+  border-radius: 20px;
+  color: black;
+}
+
+.walletAddressContainer > p:hover {
+  background-color: #d0d7e1;
+  cursor: pointer;
+}
+
 h1 {
   font-size: 2rem;
   color: #1c1e21;
