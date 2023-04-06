@@ -382,7 +382,7 @@ export default function Home() {
       console.log(error);
       let result_state = { ...result };
       result_state[method] = { response: [JSON.stringify(error.reason || error.message)], type: "error" };
-      setStatus(result_state);
+      setResult(result_state);
     }
   };
 
