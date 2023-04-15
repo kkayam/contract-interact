@@ -4,6 +4,7 @@ import { ethers } from 'ethers';
 const chains = require('../../public/chains.json');
 import SearchModal from '../components/SearchModal';
 import JsonInputModal from '../components/JsonInputModal';
+import FunctionContainer from '../components/FunctionContainer';
 import { useRouter } from 'next/router';
 
 
@@ -32,6 +33,7 @@ export default function Home() {
   const [contract, setContract] = useState({});
   const [implementationContract, setImplementationContract] = useState({});
   const [viewImplementation, setViewImplementation] = useState(false);
+  const [focusedFunction, setFocusedFunction] = useState(null);
 
   const router = useRouter();
   const addressInput = useRef(null);
@@ -69,28 +71,13 @@ export default function Home() {
               {targetContract.abi
                 .filter((item) => item.type === 'function' && item.stateMutability == "view")
                 .map((func) => (
-                  <div className="function-container" key={getUniqueFuncName(func)}>
-                    <div className="function-row">
-                      <div className='function-title'>
-                        <p className={(func.stateMutability == "view") ? "function-title read" : "function-title write"}>{func.name}</p>
-                      </div>
-                      {func.inputs.length > 0 &&
-                        <div className='function-inputs'>
-                          {func.inputs.map((input, index) => (
-                            <input key={index} className="interact-input" id={func.name + "." + input.name} placeholder={`${input.name} (${input.type})`} />
-                          ))}
-                        </div>}
-                      <button className="interact-button" onClick={() => handleInteract(func)}>Interact</button>
-                    </div>
-                    <div className='func-result'>
-                      {result[getUniqueFuncName(func)] &&
-                        (result[getUniqueFuncName(func)].type == "result") ?
-                        result[getUniqueFuncName(func)].response.map((r, i) => <p dangerouslySetInnerHTML={{ __html: ((func.outputs[i] && func.outputs[i].name) ? func.outputs[i].name + " " : "") + formatSolidityData(r) }}></p>) : ""}
-
-                      {result[getUniqueFuncName(func)] && (result[getUniqueFuncName(func)].type == "error") ?
-                        result[getUniqueFuncName(func)].response.map((r, i) => <p className='status'>{r}</p>) : ""}
-                    </div>
-                  </div>
+                  <FunctionContainer
+                    func={func}
+                    result={result}
+                    getUniqueFuncName={getUniqueFuncName}
+                    handleInteract={handleInteract}
+                    formatSolidityData={formatSolidityData}
+                    viewImplementation={viewImplementation} />
                 ))
               }</div>
             <div className='function-type-container'>
@@ -98,28 +85,13 @@ export default function Home() {
               {targetContract.abi
                 .filter((item) => item.type === 'function' && item.stateMutability != "view")
                 .map((func) => (
-                  <div className="function-container" key={getUniqueFuncName(func)}>
-                    <div className="function-row">
-                      <div className='function-title'>
-                        <p className={(func.stateMutability == "view") ? "function-title read" : "function-title write"}>{func.name}</p>
-                      </div>
-                      {func.inputs.length > 0 &&
-                        <div className='function-inputs'>
-                          {func.inputs.map((input, index) => (
-                            <input key={index} className="interact-input" id={func.name + "." + input.name} placeholder={`${input.name} (${input.type})`} />
-                          ))}
-                        </div>}
-                      <button className="interact-button" onClick={() => handleInteract(func)}>Interact</button>
-                    </div>
-                    <div className='func-result'>
-                      {result[getUniqueFuncName(func)] &&
-                        (result[getUniqueFuncName(func)].type == "result") ?
-                        result[getUniqueFuncName(func)].response.map((r, i) => <p dangerouslySetInnerHTML={{ __html: ((func.outputs[i] && func.outputs[i].name) ? func.outputs[i].name + " " : "") + formatSolidityData(r) }}></p>) : ""}
-
-                      {result[getUniqueFuncName(func)] && (result[getUniqueFuncName(func)].type == "error") ?
-                        result[getUniqueFuncName(func)].response.map((r, i) => <p className='status'>{r}</p>) : ""}
-                    </div>
-                  </div>
+                  <FunctionContainer
+                    func={func}
+                    result={result}
+                    getUniqueFuncName={getUniqueFuncName}
+                    handleInteract={handleInteract}
+                    formatSolidityData={formatSolidityData}
+                    viewImplementation={viewImplementation} />
                 ))
               }</div>
           </div>
@@ -202,7 +174,7 @@ export default function Home() {
       newOption.innerHTML = `<option key=${blockchain} value=${blockchain}>${blockchain}</option>`.trim();
       blockchainList.insertBefore(newOption, blockchainList.lastChild);
     }
-    blockchainList.value = blockchain;
+    if (blockchainList) blockchainList.value = blockchain;
   }
 
   function submitCustomAbi(abi) {
@@ -247,11 +219,20 @@ export default function Home() {
       if (router.query.contractAddress) {
         setContractAddress(router.query.contractAddress);
       }
+      if (router.query.function) {
+        if (router.query.function.slice(-1) == "_") {
+          setViewImplementation(true);
+          setFocusedFunction(router.query.function.slice(0, -1));
+        } else {
+          setViewImplementation(false);
+          setFocusedFunction(router.query.function);
+        }
+      }
     }
   }, [router.isReady]);
 
   useEffect(() => {
-    addressInput.current.focus();
+    if (addressInput) addressInput.current.focus();
   }, []);
 
   useEffect(() => {
@@ -312,7 +293,15 @@ export default function Home() {
       setImplementationContract({});
     }
     if (router.isReady) {
-      if (contractAddress) {
+      if (contractAddress && focusedFunction) {
+        router.push(
+          {
+            pathname: '/',
+            query: { blockchain, contractAddress, function: focusedFunction }
+          }, undefined,
+          { shallow: true }
+        );
+      } else if (contractAddress) {
         router.push(
           {
             pathname: '/',
@@ -333,7 +322,7 @@ export default function Home() {
   }, [contractAddress, blockchain]);
 
   const handleInteract = async (func) => {
-    if (!contractAddress || contractAddress.length != 42 || !contract.abi) {
+    if (!contractAddress || !contract.abi) {
       setStatus('Please enter a valid contract address and select a blockchain');
       return;
     }
@@ -393,38 +382,87 @@ export default function Home() {
       </Head>
 
       <main>
-        <p className='header'>Add any valid contract address (or ENS domain) below and select the target blockchain to start interacting with the contract. If ABI has not yet been published by the author, or the target blockchain is Other, you must provide your own ABI.</p>
-        <div className='walletAddressContainer'>
-          {walletAddress ? (
-            <p onClick={copyWallet}><img height="18px" src={walletCopied ? "check.svg" : "copy.svg"} />&nbsp;{walletAddress}</p>
-          ) : (
-            <button onClick={handleWalletConnect}>Connect your wallet</button>
-          )}
-        </div>
-        <SearchModal
-          isOpen={searchModal}
-          onSelect={modalSelect}
-          onClose={() => setSearchModal(false)}
-        />
-        <JsonInputModal
-          isOpen={abiModal}
-          onSubmit={submitCustomAbi}
-          onClose={() => setAbiModal(false)}
-        />
-        <div className="row">
-          <input ref={addressInput} className='main' type="text" placeholder='0x00000..' value={contractAddress} onChange={event => setContractAddress(event.target.value)} />
-          <select className='main' id='blockchainList' onChange={selectBlockchain}>
-            {supportedBlockchains.map((blockchain) => (
-              <option key={blockchain} value={blockchain}>
-                {blockchain}
-              </option>
-            ))}
-            <option key="Other" value="Other">Other</option>
-          </select>
-          <button className='abiButton' onClick={() => setAbiModal(true)}>+ABI</button>
-        </div>
-        <h4 id="status" className='status'>{status}</h4>
-        {contract.abi && !viewImplementation ? contractView(contract) : contractView(implementationContract)}
+        {focusedFunction == null && <>
+          <p className='header'>Add any valid contract address (or ENS domain) below and select the target blockchain to start interacting with the contract. If ABI has not yet been published by the author, or the target blockchain is Other, you must provide your own ABI.</p>
+          <div className='walletAddressContainer'>
+            {walletAddress ? (
+              <p onClick={copyWallet}><img height="18px" src={walletCopied ? "check.svg" : "copy.svg"} />&nbsp;{walletAddress}</p>
+            ) : (
+              <button onClick={handleWalletConnect}>Connect your wallet</button>
+            )}
+          </div>
+          <SearchModal
+            isOpen={searchModal}
+            onSelect={modalSelect}
+            onClose={() => setSearchModal(false)}
+          />
+          <JsonInputModal
+            isOpen={abiModal}
+            onSubmit={submitCustomAbi}
+            onClose={() => setAbiModal(false)}
+          />
+          <div className="row">
+            <input ref={addressInput} className='main' type="text" placeholder='0x00000..' value={contractAddress} onChange={event => setContractAddress(event.target.value)} />
+            <select className='main' id='blockchainList' onChange={selectBlockchain}>
+              {supportedBlockchains.map((blockchain) => (
+                <option key={blockchain} value={blockchain}>
+                  {blockchain}
+                </option>
+              ))}
+              <option key="Other" value="Other">Other</option>
+            </select>
+            <button className='abiButton' onClick={() => setAbiModal(true)}>+ABI</button>
+          </div>
+          <h4 id="status" className='status'>{status}</h4>
+          {contract.abi && !viewImplementation ? contractView(contract) : contractView(implementationContract)}
+        </>}
+
+        {focusedFunction != null && contract.abi && <>
+
+          <div className='walletAddressContainer'>
+            {walletAddress ? (
+              <p onClick={copyWallet}><img height="18px" src={walletCopied ? "check.svg" : "copy.svg"} />&nbsp;{walletAddress}</p>
+            ) : (
+              <button onClick={handleWalletConnect}>Connect your wallet</button>
+            )}
+          </div>
+          <br /><br />
+          <div className='function-type-row'>
+            <div className='function-type-container'>
+              {viewImplementation && implementationContract.abi
+                .filter((item) => item.type === 'function' && getUniqueFuncName(item) == focusedFunction)
+                .map((func) => (
+                  <FunctionContainer
+                    func={func}
+                    result={result}
+                    getUniqueFuncName={getUniqueFuncName}
+                    handleInteract={handleInteract}
+                    formatSolidityData={formatSolidityData}
+                    viewImplementation={true}
+                  />
+                ))}
+              {!viewImplementation && contract.abi
+                .filter((item) => item.type === 'function' && getUniqueFuncName(item) == focusedFunction)
+                .map((func) => (
+                  <FunctionContainer
+                    func={func}
+                    result={result}
+                    getUniqueFuncName={getUniqueFuncName}
+                    handleInteract={handleInteract}
+                    formatSolidityData={formatSolidityData}
+                    viewImplementation={false}
+                  />
+                ))}
+            </div>
+          </div>
+          <br /><br />
+          <div className='contract-name-container'>
+            {viewImplementation ? implementationContract.name && (<h2 className='contract-name-no-hover'>{implementationContract.name}</h2>) : <h2 className='contract-name-no-hover'>{contract.name}</h2>}
+            <p className='contract-detail'>{blockchain}</p>
+            <p className='contract-detail'>{contractAddress}</p>
+            <a className='contract-action' target="_blank" href={chains.filter(chain => chain.name.includes(blockchain))[0].explorers[0].url + "/address/" + contractAddress}>See on explorer</a>
+          </div>
+        </>}
         <footer>Made by @kkayam, no data is saved, <a href='https://github.com/kkayam/contract-interact'>Github</a>, <a href='https://github.com/kkayam/contract-interact/issues'>Request feature</a>. Powered by Etherscan, BSCScan, Polygonscan.</footer>
       </main >
     </div >
