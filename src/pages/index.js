@@ -375,6 +375,10 @@ export default function Home() {
     }
   };
 
+  function redirectToContract() {
+    setFocusedFunction(null);
+  }
+
   return (
     <div>
       <Head>
@@ -457,7 +461,7 @@ export default function Home() {
           </div>
           <br /><br />
           <div className='contract-name-container'>
-            {viewImplementation ? implementationContract.name && (<h2 className='contract-name-no-hover'>{implementationContract.name}</h2>) : <h2 className='contract-name-no-hover'>{contract.name}</h2>}
+            {viewImplementation ? implementationContract.name && (<h2 onClick={redirectToContract} className='contract-name'>{implementationContract.name}</h2>) : <h2 onClick={redirectToContract} className='contract-name'>{contract.name}</h2>}
             <p className='contract-detail'>{blockchain}</p>
             <p className='contract-detail'>{contractAddress}</p>
             <a className='contract-action' target="_blank" href={chains.filter(chain => chain.name.includes(blockchain))[0].explorers[0].url + "/address/" + contractAddress}>See on explorer</a>
