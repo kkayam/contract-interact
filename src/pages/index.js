@@ -6,6 +6,9 @@ import SearchModal from '../components/SearchModal';
 import JsonInputModal from '../components/JsonInputModal';
 import FunctionContainer from '../components/FunctionContainer';
 import { useRouter } from 'next/router';
+import 'react-tooltip/dist/react-tooltip.css';
+import { Tooltip } from 'react-tooltip';
+
 
 
 function getUniqueFuncName(func) {
@@ -62,7 +65,8 @@ export default function Home() {
             </h2>{implementationContract.name && (<h2 onClick={() => setViewImplementation(true)} className={!viewImplementation ? 'contract-name' : 'contract-name selected-name'}>{implementationContract.name}</h2>)}
             &nbsp;&nbsp;
             <a className='contract-action' target="_blank" href={chains.filter(chain => chain.name.includes(blockchain))[0].explorers[0].url + "/address/" + contractAddress}>See on explorer</a>
-            <a onClick={copyAbi} className='contract-action'><img height="18px" src={abiCopied ? "check.svg" : "copy.svg"} />&nbsp;ABI</a>
+            <a onClick={copyAbi} className='contract-action' data-tooltip-id="my-tooltip"
+              data-tooltip-content="Copy ABI"><img height="18px" src={abiCopied ? "check.svg" : "copy.svg"} />&nbsp;ABI</a>
           </div>
           {/* Render buttons and input fields for each function in the ABI */}
           <div className='function-type-row'>
@@ -232,7 +236,7 @@ export default function Home() {
   }, [router.isReady]);
 
   useEffect(() => {
-    if (addressInput) addressInput.current.focus();
+    // if (addressInput) addressInput.current.focus();
   }, []);
 
   useEffect(() => {
@@ -387,7 +391,7 @@ export default function Home() {
 
       <main>
         {focusedFunction == null && <>
-          <p className='header'>Add any valid contract address (or ENS domain) below and select the target blockchain to start interacting with the contract. If ABI has not yet been published by the author, or the target blockchain is Other, you must provide your own ABI.</p>
+          <p className='header'>Input any valid contract address (or ENS domain) below and select the target blockchain to start interacting with the contract. If ABI has not yet been published by the author, or the target blockchain is Other, you must provide your own ABI.</p>
           <div className='walletAddressContainer'>
             {walletAddress ? (
               <p onClick={copyWallet}><img height="18px" src={walletCopied ? "check.svg" : "copy.svg"} />&nbsp;{walletAddress}</p>
@@ -461,12 +465,18 @@ export default function Home() {
           </div>
           <br /><br />
           <div className='contract-name-container'>
-            {viewImplementation ? implementationContract.name && (<h2 onClick={redirectToContract} className='contract-name'>{implementationContract.name}</h2>) : <h2 onClick={redirectToContract} className='contract-name'>{contract.name}</h2>}
-            <p className='contract-detail'>{blockchain}</p>
-            <p className='contract-detail'>{contractAddress}</p>
+            <h2 onClick={redirectToContract} className='contract-name' data-tooltip-id="my-tooltip"
+              data-tooltip-content="Go to contract">{viewImplementation ? implementationContract.name && implementationContract.name : contract.name}</h2>
+            <p className='contract-detail'
+              data-tooltip-id="my-tooltip"
+              data-tooltip-content="Blockchain">{blockchain}</p>
+
+            <p className='contract-detail' data-tooltip-id="my-tooltip"
+              data-tooltip-content="Contract address">{contractAddress}</p>
             <a className='contract-action' target="_blank" href={chains.filter(chain => chain.name.includes(blockchain))[0].explorers[0].url + "/address/" + contractAddress}>See on explorer</a>
           </div>
         </>}
+        <Tooltip style={{ padding: "7px 11px", borderRadius: "10px", fontSize: "0.8rem" }} className='no' delayShow={300} id="my-tooltip" />
         <footer>Made by @kkayam, no data is saved, <a href='https://github.com/kkayam/contract-interact'>Github</a>, <a href='https://github.com/kkayam/contract-interact/issues'>Request feature</a>. Powered by Etherscan, BSCScan, Polygonscan.</footer>
       </main >
     </div >
