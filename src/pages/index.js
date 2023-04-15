@@ -419,7 +419,8 @@ export default function Home() {
               ))}
               <option key="Other" value="Other">Other</option>
             </select>
-            <button className='abiButton' onClick={() => setAbiModal(true)}>+ABI</button>
+            <button className='abiButton' onClick={() => setAbiModal(true)} data-tooltip-id="my-tooltip"
+              data-tooltip-content="Add your own ABI">+ABI</button>
           </div>
           <h4 id="status" className='status'>{status}</h4>
           {contract.abi && !viewImplementation ? contractView(contract) : contractView(implementationContract)}
