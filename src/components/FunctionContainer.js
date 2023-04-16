@@ -8,8 +8,7 @@ const FunctionContainer = ({ func, result, getUniqueFuncName, handleInteract, fo
     return <div className="function-container" key={getUniqueFuncName(func)}>
         <div className="function-row">
             <div className='function-title'>
-                <img onClick={copyFunctionLink} src="link.svg" className='link' data-tooltip-id="my-tooltip"
-                    data-tooltip-content="Copy permalink" />
+                <img onClick={copyFunctionLink} src="link.svg" className='link' data-tooltip-id="my-tooltip" data-tooltip-content="Copy permalink" />
                 <p data-tooltip-id="my-tooltip"
                     data-tooltip-content={(func.stateMutability == "view") ? "Read function" : "Write function"} className={(func.stateMutability == "view") ? "function-title read" : "function-title write"}>{func.name}</p>
             </div>

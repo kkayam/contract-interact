@@ -51,6 +51,9 @@ export default function Home() {
     setWalletCopied(true);
     setAbiCopied(false);
   }
+  function copyContractLink() {
+    navigator.clipboard.writeText(window.location.href);
+  }
 
   useEffect(() => {
     setAbiCopied(false);
@@ -61,13 +64,16 @@ export default function Home() {
       return (
         <div className='contract'>
           <div className='contract-name-container'>
-            <h2 onClick={() => setViewImplementation(false)} className={viewImplementation ? 'contract-name' : 'contract-name selected-name'}>{contract.name}
-            </h2>{implementationContract.name && (<h2 onClick={() => setViewImplementation(true)} className={!viewImplementation ? 'contract-name' : 'contract-name selected-name'}>{implementationContract.name}</h2>)}
+            <img className='contract-link' onClick={copyContractLink} src="link.svg" data-tooltip-id="my-tooltip" data-tooltip-content="Copy permalink" />
+            <h2 onClick={() => setViewImplementation(false)} className={viewImplementation ? 'contract-name' : 'contract-name selected-name'}>{contract.name}</h2>
+            {implementationContract.name && (<h2 onClick={() => setViewImplementation(true)} className={!viewImplementation ? 'contract-name' : 'contract-name selected-name'}>{implementationContract.name}</h2>)}
             &nbsp;&nbsp;
             <a className='contract-action' target="_blank" href={chains.filter(chain => chain.name.includes(blockchain))[0].explorers[0].url + "/address/" + contractAddress}>
-              <img className="svg" src="external-link.svg" />&nbsp;See on explorer</a>
-            <a onClick={copyAbi} className='contract-action' data-tooltip-id="my-tooltip"
-              data-tooltip-content="Copy ABI"><img className="svg" src={abiCopied ? "check.svg" : "copy.svg"} />&nbsp;ABI</a>
+              <img className="svg" src="external-link.svg" />&nbsp;See on explorer
+            </a>
+            <a onClick={copyAbi} className='contract-action' data-tooltip-id="my-tooltip" data-tooltip-content="Copy ABI">
+              <img className="svg" src={abiCopied ? "check.svg" : "copy.svg"} />&nbsp;ABI
+            </a>
           </div>
           {/* Render buttons and input fields for each function in the ABI */}
           <div className='function-type-row'>

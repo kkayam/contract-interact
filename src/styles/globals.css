@@ -153,6 +153,19 @@ img.svg {
   height: 17px;
 }
 
+img.contract-link {
+  height: 30px;
+  margin-right: 7px;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 25px;
+  /* background-color: #eff1f5; */
+}
+
+img.contract-link:hover {
+  background-color: #d1d5db;
+}
+
 p.function-title {
   color: #1c1e21;
   border-radius: 15px;
@@ -341,7 +354,7 @@ a {
 
 .contract-name,
 .contract-name-no-hover {
-  background-color: #eff1f5;
+  /* background-color: #eff1f5; */
   padding: 13px 29px;
   font-weight: 100;
   font-size: 1.3rem;
