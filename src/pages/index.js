@@ -64,9 +64,10 @@ export default function Home() {
             <h2 onClick={() => setViewImplementation(false)} className={viewImplementation ? 'contract-name' : 'contract-name selected-name'}>{contract.name}
             </h2>{implementationContract.name && (<h2 onClick={() => setViewImplementation(true)} className={!viewImplementation ? 'contract-name' : 'contract-name selected-name'}>{implementationContract.name}</h2>)}
             &nbsp;&nbsp;
-            <a className='contract-action' target="_blank" href={chains.filter(chain => chain.name.includes(blockchain))[0].explorers[0].url + "/address/" + contractAddress}>See on explorer</a>
+            <a className='contract-action' target="_blank" href={chains.filter(chain => chain.name.includes(blockchain))[0].explorers[0].url + "/address/" + contractAddress}>
+              <img className="svg" src="external-link.svg" />&nbsp;See on explorer</a>
             <a onClick={copyAbi} className='contract-action' data-tooltip-id="my-tooltip"
-              data-tooltip-content="Copy ABI"><img height="18px" src={abiCopied ? "check.svg" : "copy.svg"} />&nbsp;ABI</a>
+              data-tooltip-content="Copy ABI"><img className="svg" src={abiCopied ? "check.svg" : "copy.svg"} />&nbsp;ABI</a>
           </div>
           {/* Render buttons and input fields for each function in the ABI */}
           <div className='function-type-row'>
@@ -323,7 +324,7 @@ export default function Home() {
         );
       }
     }
-  }, [contractAddress, blockchain]);
+  }, [contractAddress, blockchain, focusedFunction]);
 
   const handleInteract = async (func) => {
     if (!contractAddress || !contract.abi) {
@@ -332,7 +333,7 @@ export default function Home() {
     }
 
     if (window.ethereum.networkVersion != chainId) {
-      switchChain(chainId);
+      await switchChain(chainId);
     }
 
     try {
@@ -386,7 +387,7 @@ export default function Home() {
   return (
     <div>
       <Head>
-        <title>Contract Interact</title>
+        <title>{contract.name ? "Interact - " + contract.name : "Contract Interact"}</title>
       </Head>
 
       <main>
@@ -394,7 +395,7 @@ export default function Home() {
           <p className='header'>Input any valid contract address (or ENS domain) below and select the target blockchain to start interacting with the contract. If ABI has not yet been published by the author, or the target blockchain is Other, you must provide your own ABI.</p>
           <div className='walletAddressContainer'>
             {walletAddress ? (
-              <p onClick={copyWallet}><img height="18px" src={walletCopied ? "check.svg" : "copy.svg"} />&nbsp;{walletAddress}</p>
+              <p onClick={copyWallet}><img className="svg" src={walletCopied ? "check.svg" : "copy.svg"} />&nbsp;{walletAddress}</p>
             ) : (
               <button onClick={handleWalletConnect}>Connect your wallet</button>
             )}
@@ -427,15 +428,15 @@ export default function Home() {
         </>}
 
         {focusedFunction != null && contract.abi && <>
-
           <div className='walletAddressContainer'>
             {walletAddress ? (
-              <p onClick={copyWallet}><img height="18px" src={walletCopied ? "check.svg" : "copy.svg"} />&nbsp;{walletAddress}</p>
+              <p onClick={copyWallet}><img className="svg" src={walletCopied ? "check.svg" : "copy.svg"} />&nbsp;{walletAddress}</p>
             ) : (
-              <button onClick={handleWalletConnect}>Connect your wallet</button>
+              <button onClick={handleWalletConnect} >Connect your wallet</button>
             )}
           </div>
-          <br /><br />
+          <br />
+          <br />
           <div className='function-type-row'>
             <div className='function-type-container'>
               {viewImplementation && implementationContract.abi
@@ -464,17 +465,23 @@ export default function Home() {
                 ))}
             </div>
           </div>
-          <br /><br />
+          <br />
+          <br />
+          <p>Interacting with <b>{focusedFunction}</b> of <b>{contract.name}</b> on <b>{blockchain}</b></p>
           <div className='contract-name-container'>
-            <h2 onClick={redirectToContract} className='contract-name' data-tooltip-id="my-tooltip"
-              data-tooltip-content="Go to contract">{viewImplementation ? implementationContract.name && implementationContract.name : contract.name}</h2>
             <p className='contract-detail'
               data-tooltip-id="my-tooltip"
               data-tooltip-content="Blockchain">{blockchain}</p>
 
-            <p className='contract-detail' data-tooltip-id="my-tooltip"
-              data-tooltip-content="Contract address">{contractAddress}</p>
-            <a className='contract-action' target="_blank" href={chains.filter(chain => chain.name.includes(blockchain))[0].explorers[0].url + "/address/" + contractAddress}>See on explorer</a>
+            <p
+              className='contract-detail'
+              style={{ cursor: "pointer" }}
+              data-tooltip-id="my-tooltip"
+              data-tooltip-content="Contract address"
+              onClick={redirectToContract}>
+              <img className="svg" src="external-link.svg" />&nbsp;
+              {contractAddress}</p>
+            {/* <a className='contract-action' target="_blank" href={chains.filter(chain => chain.name.includes(blockchain))[0].explorers[0].url + "/address/" + contractAddress}>See on explorer</a> */}
           </div>
         </>}
         <Tooltip style={{ padding: "7px 11px", borderRadius: "10px", fontSize: "0.8rem" }} className='no' delayShow={300} id="my-tooltip" />

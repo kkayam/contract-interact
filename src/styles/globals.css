@@ -144,9 +144,13 @@ h3 {
 }
 
 img.link {
-  height: 18px;
+  height: 20px;
   margin-right: 7px;
   cursor: pointer;
+}
+
+img.svg {
+  height: 17px;
 }
 
 p.function-title {
@@ -276,6 +280,7 @@ a {
   padding: 14px 10px;
   border-radius: 10px;
   background-color: #eff1f5;
+  box-shadow: rgba(0, 0, 0, 0.09) 0px 3px 12px;
 }
 
 /* .function-container:hover {
@@ -348,6 +353,8 @@ a {
   background-color: #eff1f5;
   padding: 5px 15px;
   border-radius: 20px;
+  display: flex;
+  align-items: center;
 }
 
 .contract-name:hover {
