@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import { useState, useEffect, useRef } from 'react';
 import { ethers } from 'ethers';
-const chains = require('../../public/chains.json');
+var chains = require('../../public/chains.json');
 import SearchModal from '../components/SearchModal';
 import JsonInputModal from '../components/JsonInputModal';
 import FunctionContainer from '../components/FunctionContainer';
@@ -9,6 +9,33 @@ import { useRouter } from 'next/router';
 import 'react-tooltip/dist/react-tooltip.css';
 import { Tooltip } from 'react-tooltip';
 
+chains.push(
+  {
+    "name": "Hardhat Local",
+    "chain": "Hardhat Local",
+    "icon": "ethereum",
+    "rpc": [
+      "http://localhost:8545"
+    ],
+    "faucets": [],
+    "nativeCurrency": {
+      "name": "Ether",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "infoURL": "https://hardhat.org",
+    "shortName": "eth",
+    "chainId": 31337,
+    "networkId": 31337,
+    "explorers": [
+      {
+        "name": "etherscan",
+        "url": "https://etherscan.io",
+        "standard": "EIP3091"
+      }
+    ]
+  }
+);
 
 
 function getUniqueFuncName(func) {
@@ -143,7 +170,7 @@ export default function Home() {
     return value.toString();
   }
 
-  const supportedBlockchains = ["Ethereum", "Binance Smart Chain", "Binance Smart Chain Testnet", "Polygon", "Sepolia", "Goerli"];
+  const supportedBlockchains = ["Ethereum", "Binance Smart Chain", "Binance Smart Chain Testnet", "Polygon", "Sepolia", "Goerli", "Hardhat Local"];
 
   const handleWalletConnect = async () => {
     try {
@@ -254,6 +281,7 @@ export default function Home() {
     setAbiCopied(false);
     setContract({});
     setImplementationContract({});
+    setResult({});
     if (contractAddress && contractAddress.length == 42 && blockchain) {
       try {
         fetchAbi(contractAddress).then((fetchedAbi) => {
