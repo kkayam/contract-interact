@@ -86,6 +86,15 @@ export default function Home() {
     navigator.clipboard.writeText(url.toString());
   }
 
+  function copyFunctionLink(func) {
+    var base_url = window.location.origin;
+    let url = new URL(base_url);
+    url.searchParams.set("blockchain", blockchain);
+    url.searchParams.set("contractAddress", contractAddress);
+    url.searchParams.set("function", getUniqueFuncName(func) + (viewImplementation ? "_" : ""));
+    navigator.clipboard.writeText(url.toString());
+  }
+
   useEffect(() => {
     setAbiCopied(false);
   }, [viewImplementation]);
@@ -119,7 +128,8 @@ export default function Home() {
                     getUniqueFuncName={getUniqueFuncName}
                     handleInteract={handleInteract}
                     formatSolidityData={formatSolidityData}
-                    viewImplementation={viewImplementation} />
+                    viewImplementation={viewImplementation}
+                    copyFunctionLink={copyFunctionLink} />
                 ))
               }</div>
             <div className='function-type-container'>
@@ -133,7 +143,8 @@ export default function Home() {
                     getUniqueFuncName={getUniqueFuncName}
                     handleInteract={handleInteract}
                     formatSolidityData={formatSolidityData}
-                    viewImplementation={viewImplementation} />
+                    viewImplementation={viewImplementation}
+                    copyFunctionLink={copyFunctionLink} />
                 ))
               }</div>
           </div>
@@ -427,7 +438,7 @@ export default function Home() {
   return (
     <div>
       <Head>
-        <title>{contract.name ? "Interact - " + contract.name : "Contract Interact"}</title>
+        <title>{contract.name ? focusedFunction ? "Interact - " + focusedFunction : "Interact - " + contract.name : "Contract Interact"}</title>
       </Head>
 
       <main>
@@ -476,51 +487,46 @@ export default function Home() {
             )}
           </div>
           <br />
+          <p>Interacting with <b>{focusedFunction}</b> of <b>{contract.name}</b> on <b>{blockchain}</b></p>
           <br />
-          <div className='function-type-row'>
-            <div className='function-type-container'>
-              {viewImplementation && implementationContract.abi
-                .filter((item) => item.type === 'function' && getUniqueFuncName(item) == focusedFunction)
-                .map((func) => (
-                  <FunctionContainer
-                    func={func}
-                    result={result}
-                    getUniqueFuncName={getUniqueFuncName}
-                    handleInteract={handleInteract}
-                    formatSolidityData={formatSolidityData}
-                    viewImplementation={true}
-                  />
-                ))}
-              {!viewImplementation && contract.abi
-                .filter((item) => item.type === 'function' && getUniqueFuncName(item) == focusedFunction)
-                .map((func) => (
-                  <FunctionContainer
-                    func={func}
-                    result={result}
-                    getUniqueFuncName={getUniqueFuncName}
-                    handleInteract={handleInteract}
-                    formatSolidityData={formatSolidityData}
-                    viewImplementation={false}
-                  />
-                ))}
-            </div>
+          <div className='function-type-row' style={{ width: "40%" }}>
+            {viewImplementation && implementationContract.abi
+              .filter((item) => item.type === 'function' && getUniqueFuncName(item) == focusedFunction)
+              .map((func) => (
+                <FunctionContainer
+                  func={func}
+                  result={result}
+                  getUniqueFuncName={getUniqueFuncName}
+                  handleInteract={handleInteract}
+                  formatSolidityData={formatSolidityData}
+                  viewImplementation={true}
+                  copyFunctionLink={copyFunctionLink}
+                />
+              ))}
+            {!viewImplementation && contract.abi
+              .filter((item) => item.type === 'function' && getUniqueFuncName(item) == focusedFunction)
+              .map((func) => (
+                <FunctionContainer
+                  func={func}
+                  result={result}
+                  getUniqueFuncName={getUniqueFuncName}
+                  handleInteract={handleInteract}
+                  formatSolidityData={formatSolidityData}
+                  viewImplementation={false}
+                  copyFunctionLink={copyFunctionLink}
+                />
+              ))}
           </div>
           <br />
           <br />
-          <p>Interacting with <b>{focusedFunction}</b> of <b>{contract.name}</b> on <b>{blockchain}</b></p>
           <div className='contract-name-container'>
-            <p className='contract-detail'
-              data-tooltip-id="my-tooltip"
-              data-tooltip-content="Blockchain">{blockchain}</p>
-
             <p
               className='contract-detail'
-              style={{ cursor: "pointer" }}
-              data-tooltip-id="my-tooltip"
-              data-tooltip-content="Contract address"
               onClick={redirectToContract}>
-              <img className="svg" src="external-link.svg" />&nbsp;
-              {contractAddress}</p>
+              See the rest of the contract: {contractAddress}
+              &nbsp;&nbsp;
+              <img className="svg" src="external-link.svg" />
+            </p>
             {/* <a className='contract-action' target="_blank" href={chains.filter(chain => chain.name.includes(blockchain))[0].explorers[0].url + "/address/" + contractAddress}>See on explorer</a> */}
           </div>
         </>}

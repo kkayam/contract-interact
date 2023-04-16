@@ -1,14 +1,11 @@
 import React from 'react';
 
-const FunctionContainer = ({ func, result, getUniqueFuncName, handleInteract, formatSolidityData, viewImplementation }) => {
-    function copyFunctionLink() {
-        let url = window.location.href + "&function=" + getUniqueFuncName(func) + (viewImplementation ? "_" : "");
-        navigator.clipboard.writeText(url);
-    }
+const FunctionContainer = ({ func, copyFunctionLink, result, getUniqueFuncName, handleInteract, formatSolidityData, viewImplementation }) => {
+
     return <div className="function-container" key={getUniqueFuncName(func)}>
         <div className="function-row">
             <div className='function-title'>
-                <img onClick={copyFunctionLink} src="link.svg" className='link' data-tooltip-id="my-tooltip" data-tooltip-content="Copy permalink" />
+                <img onClick={() => copyFunctionLink(func)} src="link.svg" className='link' data-tooltip-id="my-tooltip" data-tooltip-content="Copy permalink" />
                 <p data-tooltip-id="my-tooltip"
                     data-tooltip-content={(func.stateMutability == "view") ? "Read function" : "Write function"} className={(func.stateMutability == "view") ? "function-title read" : "function-title write"}>{func.name}</p>
             </div>
