@@ -52,7 +52,11 @@ export default function Home() {
     setAbiCopied(false);
   }
   function copyContractLink() {
-    navigator.clipboard.writeText(window.location.href);
+    var base_url = window.location.origin;
+    let url = new URL(base_url);
+    url.searchParams.set("blockchain", blockchain);
+    url.searchParams.set("contractAddress", contractAddress);
+    navigator.clipboard.writeText(url.toString());
   }
 
   useEffect(() => {
@@ -65,8 +69,8 @@ export default function Home() {
         <div className='contract'>
           <div className='contract-name-container'>
             <img className='contract-link' onClick={copyContractLink} src="link.svg" data-tooltip-id="my-tooltip" data-tooltip-content="Copy permalink" />
-            <h2 onClick={() => setViewImplementation(false)} className={viewImplementation ? 'contract-name' : 'contract-name selected-name'}>{contract.name}</h2>
-            {implementationContract.name && (<h2 onClick={() => setViewImplementation(true)} className={!viewImplementation ? 'contract-name' : 'contract-name selected-name'}>{implementationContract.name}</h2>)}
+            <h2 onClick={() => setViewImplementation(false)} className={viewImplementation ? 'contract-name' : 'contract-name selected-name'} data-tooltip-id="my-tooltip" data-tooltip-content={implementationContract.abi ? "Proxy contract" : "Contract"}>{contract.name}</h2>
+            {implementationContract.name && (<h2 onClick={() => setViewImplementation(true)} className={!viewImplementation ? 'contract-name' : 'contract-name selected-name'} data-tooltip-id="my-tooltip" data-tooltip-content="Implementation contract">{implementationContract.name}</h2>)}
             &nbsp;&nbsp;
             <a className='contract-action' target="_blank" href={chains.filter(chain => chain.name.includes(blockchain))[0].explorers[0].url + "/address/" + contractAddress}>
               <img className="svg" src="external-link.svg" />&nbsp;See on explorer
@@ -248,6 +252,8 @@ export default function Home() {
 
   useEffect(() => {
     setAbiCopied(false);
+    setContract({});
+    setImplementationContract({});
     if (contractAddress && contractAddress.length == 42 && blockchain) {
       try {
         fetchAbi(contractAddress).then((fetchedAbi) => {

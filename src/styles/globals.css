@@ -160,10 +160,11 @@ img.contract-link {
   padding: 10px;
   border-radius: 25px;
   /* background-color: #eff1f5; */
+  box-shadow: rgba(33, 35, 38, 0.1) 0px 5px 10px 0px;
 }
 
 img.contract-link:hover {
-  background-color: #d1d5db;
+  background-color: #d1d5db64;
 }
 
 p.function-title {
@@ -360,6 +361,7 @@ a {
   font-size: 1.3rem;
   user-select: none;
   border-radius: 25px;
+  cursor: pointer;
   margin-bottom: 1rem;
 }
 .contract-detail {
@@ -371,12 +373,11 @@ a {
 }
 
 .contract-name:hover {
-  background-color: #d0d7e1;
-  cursor: pointer;
+  background-color: #d1d5db64;
 }
 
 .selected-name {
-  background-color: #d0d7e1;
+  box-shadow: rgba(33, 35, 38, 0.1) 0px 5px 10px 0px;
 }
 
 .func-result > p {
