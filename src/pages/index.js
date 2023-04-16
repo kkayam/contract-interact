@@ -435,7 +435,7 @@ export default function Home() {
           <p className='header'>Input any valid contract address (or ENS domain) below and select the target blockchain to start interacting with the contract. If ABI has not yet been published by the author, or the target blockchain is Other, you must provide your own ABI.</p>
           <div className='walletAddressContainer'>
             {walletAddress ? (
-              <p onClick={copyWallet}><img className="svg" src={walletCopied ? "check.svg" : "copy.svg"} />&nbsp;{walletAddress}</p>
+              <span onClick={copyWallet}><img className="svg" src={walletCopied ? "check.svg" : "copy.svg"} />&nbsp;{walletAddress}</span>
             ) : (
               <button onClick={handleWalletConnect}>Connect your wallet</button>
             )}
