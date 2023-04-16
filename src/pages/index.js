@@ -470,7 +470,7 @@ export default function Home() {
         {focusedFunction != null && contract.abi && <>
           <div className='walletAddressContainer'>
             {walletAddress ? (
-              <p onClick={copyWallet}><img className="svg" src={walletCopied ? "check.svg" : "copy.svg"} />&nbsp;{walletAddress}</p>
+              <span onClick={copyWallet}><img className="svg" src={walletCopied ? "check.svg" : "copy.svg"} />&nbsp;{walletAddress}</span>
             ) : (
               <button onClick={handleWalletConnect} >Connect your wallet</button>
             )}
